@@ -15,6 +15,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. On the board, click the "New Bug" button in the title bar.
     - expect: A dialog named "Create bug" is visible.
     - expect: The dialog contains labeled Title, Severity, Owner, and Description controls.
@@ -26,6 +27,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog while authenticated as buggy.
     - expect: The Owner field value is "buggy".
     - expect: The Title field is focused and empty.
@@ -36,6 +38,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog.
     - expect: The Create bug dialog is visible.
   2. Fill Title with a unique title, select HIGH in Severity, keep Owner as buggy, and fill Description with valid text including special characters such as < and >.
@@ -49,6 +52,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog and enter a unique title.
     - expect: The entered title is visible in the dialog.
   2. Click Cancel.
@@ -60,6 +64,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog and enter a unique title.
     - expect: The entered title is visible in the dialog.
   2. Click the Close button in the upper-right corner.
@@ -71,6 +76,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog and enter a unique title.
     - expect: The entered title is visible in the dialog.
   2. Press Escape.
@@ -82,6 +88,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog and enter a unique title and description.
     - expect: The entered values are visible in the dialog.
   2. Click the dimmed backdrop outside the dialog panel.
@@ -93,6 +100,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, 
 **File:** `tests/create-bug/create-bug.spec.ts`
 
 **Steps:**
+
   1. Open the Create bug dialog without filling any fields.
     - expect: The dialog is visible.
   2. Click Save.
