@@ -1,0 +1,101 @@
+# BuggyBoard Create Bug End-to-End Test Plan
+
+## Application Overview
+
+BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, opens the Create bug dialog from the title bar, enters title, severity, owner, and description, then saves or dismisses the modal. The create-bug workflow should persist valid data, default owner to the logged-in user, validate required fields, close through Cancel, Close, or Escape, and remain open when the backdrop is clicked.
+
+## Test Scenarios
+
+### 1. Create bug workflow
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 1.1. opens the create-bug modal with required controls
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. On the board, click the "New Bug" button in the title bar.
+    - expect: A dialog named "Create bug" is visible.
+    - expect: The dialog contains labeled Title, Severity, Owner, and Description controls.
+    - expect: The dialog contains Cancel and Save buttons.
+    - expect: The Severity control offers HIGH, MID, and LOW options.
+
+#### 1.2. defaults owner to the authenticated user
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog while authenticated as buggy.
+    - expect: The Owner field value is "buggy".
+    - expect: The Title field is focused and empty.
+    - expect: The Severity field defaults to MID.
+
+#### 1.3. saves a valid bug and closes the modal
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog.
+    - expect: The Create bug dialog is visible.
+  2. Fill Title with a unique title, select HIGH in Severity, keep Owner as buggy, and fill Description with valid text including special characters such as < and >.
+    - expect: The entered values remain in their respective controls.
+  3. Click Save.
+    - expect: The dialog is closed.
+    - expect: A board row shows the unique title, HIGH severity, and buggy owner.
+
+#### 1.4. cancels without saving
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog and enter a unique title.
+    - expect: The entered title is visible in the dialog.
+  2. Click Cancel.
+    - expect: The dialog is closed.
+    - expect: No board row shows the unique title.
+
+#### 1.5. closes with the X button without saving
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog and enter a unique title.
+    - expect: The entered title is visible in the dialog.
+  2. Click the Close button in the upper-right corner.
+    - expect: The dialog is closed.
+    - expect: No board row shows the unique title.
+
+#### 1.6. closes with Escape without saving
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog and enter a unique title.
+    - expect: The entered title is visible in the dialog.
+  2. Press Escape.
+    - expect: The dialog is closed.
+    - expect: No board row shows the unique title.
+
+#### 1.7. keeps entered data when the backdrop is clicked
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog and enter a unique title and description.
+    - expect: The entered values are visible in the dialog.
+  2. Click the dimmed backdrop outside the dialog panel.
+    - expect: The dialog remains open.
+    - expect: The title and description values are preserved.
+
+#### 1.8. blocks save when required fields are blank
+
+**File:** `tests/create-bug/create-bug.spec.ts`
+
+**Steps:**
+  1. Open the Create bug dialog without filling any fields.
+    - expect: The dialog is visible.
+  2. Click Save.
+    - expect: The dialog remains open.
+    - expect: An alert lists required-field validation messages.
+    - expect: No new bug is added to the board.
