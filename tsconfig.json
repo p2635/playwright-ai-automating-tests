@@ -11,5 +11,5 @@
   "include": [
     "playwright.config.ts",
     "tests"
-  ]
+, "tests-vibed/bugs.spec.ts", "tests-vibed/login.spec.ts"  ]
 }
