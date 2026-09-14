@@ -1,12 +1,19 @@
 import { test, expect } from "@playwright/test";
+import users from "../users.json" with { type: "json" };
+
+const user = users.find(({ username }) => username === "buggy");
+
+if (!user) {
+  throw new Error("Test user not found");
+}
 
 test("creates a new bug", async ({ page }) => {
   const bugTitle = `Playwright bug ${Date.now()}`;
 
   await page.goto("/login");
 
-  await page.getByLabel("Username").fill("buggy");
-  await page.getByLabel("Password").fill("1970beetle");
+  await page.getByLabel("Username").fill(user.username);
+  await page.getByLabel("Password").fill(user.password);
   await page.getByRole("button", { name: "Login" }).click();
 
   await expect(page).toHaveURL(/\/board$/);
@@ -16,7 +23,7 @@ test("creates a new bug", async ({ page }) => {
   const createBugDialog = page.getByRole("dialog", { name: "Create bug" });
   await createBugDialog.getByLabel("Title").fill(bugTitle);
   await createBugDialog.getByLabel("Severity").selectOption("high");
-  await createBugDialog.getByLabel("Owner").fill("buggy");
+  await createBugDialog.getByLabel("Owner").fill(user.username);
   await createBugDialog
     .getByLabel("Description")
     .fill("This is dummy bug data for the happy path test.");
@@ -30,8 +37,8 @@ test("deletes an existing bug", async ({ page }) => {
 
   await page.goto("/login");
 
-  await page.getByLabel("Username").fill("buggy");
-  await page.getByLabel("Password").fill("1970beetle");
+  await page.getByLabel("Username").fill(user.username);
+  await page.getByLabel("Password").fill(user.password);
   await page.getByRole("button", { name: "Login" }).click();
 
   await expect(page).toHaveURL(/\/board$/);
@@ -41,7 +48,7 @@ test("deletes an existing bug", async ({ page }) => {
   const createBugDialog = page.getByRole("dialog", { name: "Create bug" });
   await createBugDialog.getByLabel("Title").fill(bugTitle);
   await createBugDialog.getByLabel("Severity").selectOption("high");
-  await createBugDialog.getByLabel("Owner").fill("buggy");
+  await createBugDialog.getByLabel("Owner").fill(user.username);
   await createBugDialog
     .getByLabel("Description")
     .fill("This is dummy bug data for the delete test.");
