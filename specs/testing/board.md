@@ -82,7 +82,7 @@ Log in and create the necessary test data for board.md test to be carried out. F
     - expect: The table contains all and only the bugs in the selected active Open state. [13-AC3, 13-AC4]
     - expect: The test does not interpret the blank query as including Closed bugs; all bugs means all bugs in the selected state. [13-AC3]
 
-#### 1.2. Filters live by title text and excludes nonmatching titles
+#### 1.2. Filter bugs by title text and exclude nonmatching titles
 
 Type a partial title into the search box and verify the board filters live to matching titles only, then refine the query further and confirm results narrow accordingly.
 
@@ -116,7 +116,7 @@ Enter a query in mixed case and with extra whitespace to confirm search matching
     - expect: The `Login fails` row is visible despite the extra whitespace. [11-AC3]
     - expect: The `Issue with log-in` row is not visible because the normalized query contains the additional word `fails`. [11-AC2, 11-AC3]
 
-#### 1.4. Normalizes punctuation for the login examples
+#### 1.4. Normalize punctuation so hyphenated and plain terms match the same titles
 
 Enter queries with and without punctuation to confirm the search normalizes punctuation so that hyphenated and plain forms of the same term match the same titles.
 
@@ -133,7 +133,7 @@ Enter queries with and without punctuation to confirm the search normalizes punc
     - expect: Both `Login fails` and `Issue with log-in` remain visible. [11-AC3]
     - expect: The result is still title-based and does not broaden to description, owner, or severity fields. [11-OOS]
 
-#### 1.5. Keeps search scope to title, excluding description owner and severity matches
+#### 1.5. Restrict search to title text only, excluding matches in description, owner, or severity
 
 Search for terms that only appear in a bug's description, owner, or severity fields and confirm those bugs are excluded because search is title-only.
 
@@ -154,7 +154,7 @@ Search for terms that only appear in a bug's description, owner, or severity fie
     - expect: No row is included based only on severity. [11-OOS]
     - expect: The result is determined by title text only. [11-OOS]
 
-#### 1.6. Displays the no-match empty state with no bug rows
+#### 1.6. Show the "No bugs matched." message when no titles match the query
 
 Enter a query that matches no titles while bugs still exist and confirm the board shows the `No bugs matched.` empty-state message rather than any bug rows.
 
