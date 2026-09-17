@@ -30,13 +30,13 @@ It started as a fork of the LinkedIn Learning course [_Playwright with AI: Agent
 ### Project Structure
 
 ```text
-backend/         Express + TypeScript API, SQLite data
-frontend/        React + TypeScript UI (Vite, Tailwind)
-tests/           Playwright test specs (AI generated and human-reviewed)
-tests-vibed/     Playwright test specs (AI generated)
-specs/           Specification docs (product, design, engineering, features)
+backend/               Express + TypeScript API, SQLite data
+frontend/              React + TypeScript UI (Vite, Tailwind)
+tests/                 Playwright test specs (AI generated and human-reviewed)
+tests-vibed/           Playwright test specs (AI generated)
+specs/                 Specification docs (product, design, engineering, features)
 playwright.config.ts   Playwright test runner config
-SETUP.md         Local setup instructions
+SETUP.md               Local setup instructions
 ```
 
 ### Course Branch Structure
