@@ -38,7 +38,7 @@ The plan is documentation only. It does not create automated test files.
 Each `expect` below cites one or more codes from this legend in square brackets, e.g. `[11-AC2]`. `[plan-only]` marks an expectation that documents a test-plan decision (fixture design, message-text distinctions) with no directly corresponding acceptance criterion.
 
 | Code | File | Acceptance Criteria / Section |
-|------|------|--------------------------------|
+| ------ | ------ | -------------------------------- |
 | 07-AC1 | `specs/features/07-bug-board.md` | Board page displays a bugs table with the correct columns |
 | 07-AC2 | `specs/features/07-bug-board.md` | Board page shows all bugs from the database |
 | 07-AC3 | `specs/features/07-bug-board.md` | Board page shows an empty table when there are no bugs |
