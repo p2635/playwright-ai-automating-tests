@@ -1,4 +1,4 @@
-# BuggyBoard Board Search Test Plan
+# BuggyBoard Board Search Test Plan v1
 
 ## Application Overview
 
