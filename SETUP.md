@@ -51,6 +51,8 @@ From the repository root:
 
 - **Build** (frontend + backend):  
   `npm run build`
+- **Seed board fixtures** (with the backend running):  
+  `npm run seed:board`
 
 - **Lint**:  
   `npm run lint`
