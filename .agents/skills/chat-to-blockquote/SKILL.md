@@ -7,13 +7,19 @@ description: Exports the current AI conversation to a markdown file, wrapped ent
 
 Exports a full AI conversation as a blockquoted markdown file, for pasting into an already-markdown blog post as a reference or citation.
 
-## Step 1: Ask about collapsibility, before generating anything
+## Step 1: Ask about collapsibility and reasoning steps, before generating anything
 
 Before producing any output, ask the user:
 
 > "Do you want the blockquote wrapped in a collapsible section, so readers can expand it to see the full conversation, or should the whole conversation always be visible?"
 
-Wait for their answer before moving on. This decision changes the structure of the output, so it must come first, not be added afterwards.
+Also ask:
+
+> "Some AI tools show collapsed intermediate reasoning steps alongside their visible replies. Do you want those included in the export, or only what's visible in the chat by default?"
+
+Wait for their answer to both questions before moving on. These decisions change the structure and content of the output, so they must come first, not be added afterwards.
+
+If the user asks for reasoning steps to be included but that content isn't available to you (for example, it wasn't part of what was shared with you, or the platform doesn't expose it), tell them so plainly rather than fabricating or approximating it, and proceed with only what's actually available.
 
 ## Step 2: Assemble the conversation, verbatim
 
@@ -26,11 +32,19 @@ Take every message in the conversation, in order, and format it as:
 ```
 
 Rules:
-
 - Do not summarize, shorten, paraphrase, reorder, or drop any message, including short ones like "thanks" or "ok."
 - Preserve original formatting inside each message: code blocks, lists, bold, links, line breaks.
 - If a message already contains a fenced code block (```), keep it fenced and intact for now — it gets prefixed along with everything else in Step 3.
 - Use the actual model name in place of "Assistant" if known (e.g. "Claude," "GPT-4o").
+- If the user asked to include reasoning steps in Step 1, add them right before the visible reply they belong to, clearly labelled, for example:
+
+```
+**Assistant (reasoning):** <reasoning text, unmodified>
+
+**Assistant:** <visible reply, unmodified>
+```
+
+If the user asked to exclude reasoning steps, or none are available, leave this label out entirely and include only the visible reply.
 - Exclude the trailing exchange where the user invokes this skill, and everything after it — for example, the request to export or turn the conversation into a blockquote, the Step 1 collapsibility question, and the user's answer to it. This part of the conversation is about producing the export, not part of the substantive conversation, and adds no value to the record. Stop the transcript at the last message that belongs to the conversation itself, before the export request began.
 
 ## Step 3: Neutralize markdown headings inside the transcript
@@ -45,7 +59,6 @@ Escape every heading marker so the text stays intact but no longer triggers head
 ```
 
 Rules:
-
 - Only escape `#` characters that appear as heading syntax at the very start of a line (after optional leading spaces). Do not touch `#` characters that appear mid-sentence, in code, or in URLs — those are not headings and must stay untouched.
 - Do this before Step 4, since adding the `> ` prefix will otherwise combine with the `#` and still register as a heading in some renderers.
 - This is a syntax-level change only. The visible text of the heading itself must remain unchanged and fully present — only its markdown heading behavior is disabled.
@@ -53,7 +66,6 @@ Rules:
 ## Step 4: Wrap the entire transcript in one blockquote
 
 Prefix **every line** of the Step 2 output with `> `, including:
-
 - Blank lines between turns (a bare `>` on its own line, not an empty line)
 - Lines inside nested code fences from the original messages
 - Lines inside any nested blockquote from the original messages
@@ -74,7 +86,6 @@ This is the step most likely to go wrong: a nested code block that isn't prefixe
 ```
 
 Requirements for this to render correctly:
-
 - Leave a blank line after `<summary>...</summary>` and before `</details>` — several markdown engines need it to resume parsing markdown inside the HTML block.
 - If the target blog uses kramdown (Jekyll's default), add `markdown="1"` to the `<details>` tag: `<details markdown="1">`. GitHub's renderer does not need this. If you don't know the target engine, ask, or include the attribute anyway since it's harmless where it isn't needed.
 - Optionally add one or two lines above the `<details>` block summarizing the exchange, so readers get the gist without expanding.
