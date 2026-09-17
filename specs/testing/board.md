@@ -65,6 +65,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 #### 1.1. Shows all visible bugs in the default active state when search is blank
 
+Log in and create the necessary test data for board.md test to be carried out. For more information, see the section "Seed / Fixture Guidance". Then confirm the board defaults to Open and lists every seeded Open bug with no search applied.
+
 **File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
@@ -82,6 +84,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 #### 1.2. Filters live by title text and excludes nonmatching titles
 
+Type a partial title into the search box and verify the board filters live to matching titles only, then refine the query further and confirm results narrow accordingly.
+
 **File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
@@ -96,6 +100,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
     - expect: The row `Issue with log-in` is not visible. [11-AC2]
 
 #### 1.3. Matches case-insensitively and normalizes whitespace
+
+Enter a query in mixed case and with extra whitespace to confirm search matching ignores case and collapses whitespace when comparing against titles.
 
 **File:** `tests/board/board-search.spec.ts`
 
@@ -112,6 +118,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 #### 1.4. Normalizes punctuation for the login examples
 
+Enter queries with and without punctuation to confirm the search normalizes punctuation so that hyphenated and plain forms of the same term match the same titles.
+
 **File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
@@ -126,6 +134,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
     - expect: The result is still title-based and does not broaden to description, owner, or severity fields. [11-OOS]
 
 #### 1.5. Keeps search scope to title, excluding description owner and severity matches
+
+Search for terms that only appear in a bug's description, owner, or severity fields and confirm those bugs are excluded because search is title-only.
 
 **File:** `tests/board/board-search.spec.ts`
 
@@ -146,6 +156,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 #### 1.6. Displays the no-match empty state with no bug rows
 
+Enter a query that matches no titles while bugs still exist and confirm the board shows the `No bugs matched.` empty-state message rather than any bug rows.
+
 **File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
@@ -157,6 +169,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
     - expect: The `Bugs` table headers remain available unless the implementation intentionally replaces the table; no bug data row is present. [07-AC3]
 
 #### 1.7. Clears search with the X control and restores the active-state board
+
+Enter a search query, then click the `Clear search` control and confirm the searchbox empties and the full set of bugs for the active state is restored.
 
 **File:** `tests/board/board-search.spec.ts`
 
@@ -173,6 +187,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
     - expect: The page does not show `No bugs matched.`. [11-AC4]
 
 #### 1.8. Preserves sort order and sort indicator while searching
+
+Sort the table by a column, then apply and change search queries, and confirm the sort order and `aria-sort` indicator remain intact throughout.
 
 **File:** `tests/board/board-search.spec.ts`
 
@@ -192,6 +208,8 @@ Each `expect` below cites one or more codes from this legend in square brackets,
     - expect: The Severity header retains its active `aria-sort` direction and indicator while the query changes. [10-AC4, 11-AC5]
 
 #### 1.9. Combines Open and Closed state filtering with title search
+
+Switch between the Open and Closed state filters while a search query is active and confirm results always reflect the intersection of the selected state and the title query.
 
 **File:** `tests/board/board-search.spec.ts`
 
