@@ -27,6 +27,18 @@ It started as a fork of the LinkedIn Learning course [_Playwright with AI: Agent
 - and an Express backend
 - and a SQLite database
 
+### Project Structure
+
+```text
+backend/         Express + TypeScript API, SQLite data
+frontend/        React + TypeScript UI (Vite, Tailwind)
+tests/           Playwright test specs (AI generated and human-reviewed)
+tests-vibed/     Playwright test specs (AI generated)
+specs/           Specification docs (product, design, engineering, features)
+playwright.config.ts   Playwright test runner config
+SETUP.md         Local setup instructions
+```
+
 ### Course Branch Structure
 
 This repo also retains the original course's example-code branches (`start`, `main`, `CHAPTER#_MOVIE#`) for reference. See [`SETUP.md`](SETUP.md) for details on how those work and how to resolve branch-switching git errors.
