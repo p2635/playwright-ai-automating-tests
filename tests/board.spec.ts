@@ -1,98 +1,8 @@
-import {
-  test,
-  expect,
-  type APIRequestContext,
-  type Page,
-} from "@playwright/test";
-import users from "../users.json" with { type: "json" };
+import { test, expect } from "@playwright/test";
+import { getUser, loginAndOpenBoard } from "./support/auth.js";
+import { seedBoardFixtures } from "./support/board-fixtures.js";
 
-const foundUser = users.find(({ username }) => username === "buggy");
-
-if (!foundUser) {
-  throw new Error("Test user not found");
-}
-
-const user = foundUser;
-
-const apiURL = process.env.BUGGYBOARD_API_URL ?? "http://localhost:3000/api";
-
-interface BugFixture {
-  title: string;
-  description: string;
-  severity: "HIGH" | "MID" | "LOW";
-  owner: string;
-  state: "OPEN" | "CLOSED";
-}
-
-const fixtures: BugFixture[] = [
-  {
-    title: "Login fails",
-    description: "Authentication timeout",
-    severity: "HIGH",
-    owner: "buggy",
-    state: "OPEN",
-  },
-  {
-    title: "Issue with log-in",
-    description: "Login form validation",
-    severity: "MID",
-    owner: "qa-user",
-    state: "OPEN",
-  },
-  {
-    title: "Search indexing delay",
-    description: "The login owner cannot find results",
-    severity: "LOW",
-    owner: "qa-user",
-    state: "OPEN",
-  },
-  {
-    title: "Payment button disabled",
-    description: "Payment cannot be submitted",
-    severity: "HIGH",
-    owner: "login-owner",
-    state: "OPEN",
-  },
-  {
-    title: "Login fixed",
-    description: "Closed authentication issue",
-    severity: "LOW",
-    owner: "qa-user",
-    state: "CLOSED",
-  },
-  {
-    title: "Archive cleanup",
-    description: "Old records",
-    severity: "HIGH",
-    owner: "buggy",
-    state: "CLOSED",
-  },
-];
-
-/** Resets the backend to only the seeded board fixtures via the REST API. */
-async function seedBoardFixtures(request: APIRequestContext) {
-  const existing = await (await request.get(`${apiURL}/bugs`)).json();
-  for (const bug of existing) {
-    await request.delete(`${apiURL}/bugs/${bug.id}`);
-  }
-
-  for (const fixture of fixtures) {
-    const response = await request.post(`${apiURL}/bugs`, { data: fixture });
-    const created = await response.json();
-
-    if (fixture.state === "CLOSED") {
-      await request.put(`${apiURL}/bugs/${created.id}`, { data: fixture });
-    }
-  }
-}
-
-async function loginAndOpenBoard(page: Page) {
-  await page.goto("/login");
-  await page.getByLabel("Username").fill(user.username);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByRole("button", { name: "Login" }).click();
-  await expect(page).toHaveURL(/\/board$/);
-}
+const user = getUser("buggy");
 
 test.describe("Board search and state-filter workflows", () => {
   // The fixtures below reset a single shared SQLite-backed API, so tests must not run concurrently.
@@ -101,7 +11,7 @@ test.describe("Board search and state-filter workflows", () => {
   test.beforeEach(async ({ page, request }) => {
     // Arrange: reset backend data to the deterministic fixture set, then authenticate.
     await seedBoardFixtures(request);
-    await loginAndOpenBoard(page);
+    await loginAndOpenBoard(page, user);
   });
 
   test("shows all seeded Open bugs when the board loads with search blank", async ({
