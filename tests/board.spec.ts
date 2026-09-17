@@ -5,8 +5,6 @@ import { seedBoardFixtures } from "./support/board-fixtures.js";
 const user = getUser("buggy");
 
 test.describe("Board search and state-filter workflows", () => {
-  // The fixtures below reset a single shared SQLite-backed API, so tests must not run concurrently.
-  test.describe.configure({ mode: "serial" });
 
   test.beforeEach(async ({ page, request }) => {
     // Arrange: reset backend data to the deterministic fixture set, then authenticate.
