@@ -1,8 +1,16 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator } from "@playwright/test";
 import { getUser, loginAndOpenBoard } from "./support/auth.js";
 import { seedBoardFixtures } from "./support/board-fixtures.js";
 
 const user = getUser("buggy");
+
+function visibleTitles(bugsTable: Locator) {
+  return bugsTable.locator("tbody tr td:nth-child(3)").allInnerTexts();
+}
+
+function visibleSeverities(bugsTable: Locator) {
+  return bugsTable.locator("tbody tr td:nth-child(2)").allInnerTexts();
+}
 
 test.describe("Board search and state-filter workflows", () => {
   test.beforeEach(async ({ page, request }) => {
@@ -36,6 +44,16 @@ test.describe("Board search and state-filter workflows", () => {
     ).toBeHidden();
     await expect(page.getByText("No bugs matched.")).toBeHidden();
     await expect(page.getByText("No bugs.")).toBeHidden();
+
+    const titles = await visibleTitles(bugsTable);
+    expect(titles.sort()).toEqual(
+      [
+        "Login fails",
+        "Issue with log-in",
+        "Search indexing delay",
+        "Payment button disabled",
+      ].sort()
+    );
   });
 
   test("filters bugs by title text and excludes nonmatching titles as the query narrows", async ({
@@ -201,7 +219,13 @@ test.describe("Board search and state-filter workflows", () => {
       bugsTable.getByText("Login fails", { exact: true })
     ).toBeVisible();
     await expect(
+      bugsTable.getByText("Issue with log-in", { exact: true })
+    ).toBeVisible();
+    await expect(
       bugsTable.getByText("Search indexing delay", { exact: true })
+    ).toBeVisible();
+    await expect(
+      bugsTable.getByText("Payment button disabled", { exact: true })
     ).toBeVisible();
     await expect(
       bugsTable.getByText("Login fixed", { exact: true })
@@ -215,6 +239,7 @@ test.describe("Board search and state-filter workflows", () => {
     const searchbox = page.getByRole("search", {
       name: "Search bugs by title",
     });
+    const bugsTable = page.getByRole("table", { name: "Bugs" });
     const titleSortButton = page.getByRole("button", { name: "Title" });
     const severitySortButton = page.getByRole("button", { name: "Severity" });
     const titleColumnHeader = page.getByRole("columnheader", {
@@ -227,10 +252,20 @@ test.describe("Board search and state-filter workflows", () => {
     await titleSortButton.click();
 
     await expect(titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(await visibleTitles(bugsTable)).toEqual([
+      "Issue with log-in",
+      "Login fails",
+      "Payment button disabled",
+      "Search indexing delay",
+    ]);
 
     await searchbox.fill("login");
 
     await expect(titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(await visibleTitles(bugsTable)).toEqual([
+      "Issue with log-in",
+      "Login fails",
+    ]);
 
     await severitySortButton.click();
     await searchbox.fill("log");
@@ -239,6 +274,9 @@ test.describe("Board search and state-filter workflows", () => {
       "aria-sort",
       /ascending|descending/
     );
+    // A fresh column click always starts ascending: LOW(0) < MID(1) < HIGH(2).
+    // "log" matches Open titles "Issue with log-in" (MID) and "Login fails" (HIGH).
+    expect(await visibleSeverities(bugsTable)).toEqual(["MID", "HIGH"]);
   });
 
   test("combines Open and Closed state filtering with an active title search", async ({
