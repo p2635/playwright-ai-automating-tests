@@ -11,7 +11,6 @@
     "build": "npm run build -w frontend && npm run build -w backend",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "seed:board": "node seed-board-fixtures.mjs",
     "test": "playwright test --grep-invert @seed"
   },
   "devDependencies": {

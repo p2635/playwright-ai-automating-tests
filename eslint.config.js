@@ -35,11 +35,5 @@ export default tseslint.config(
     languageOptions: {
       globals: { ...globals.node },
     },
-  },
-  {
-    files: ["seed-board-fixtures.mjs"],
-    languageOptions: {
-      globals: { ...globals.node, fetch: "readonly" },
-    },
   }
 );
