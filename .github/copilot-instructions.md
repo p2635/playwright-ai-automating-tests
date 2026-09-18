@@ -12,6 +12,7 @@ When working on the **BuggyBoard** web app (bug tracker SUT for the Playwright c
 3. **Update** `specs/PROGRESS.md` when a feature or step is completed.
 4. **Pause for review** after each feature; do not start the next feature until the user directs.
 5. **Ask the user** when a decision is unclear instead of assuming.
+6. **Generate tests** based on the specs, not the implementation. The implementation may change, but the specs are the source of truth. The tests should also follow the AAA pattern (Arrange, Act, Assert) and be structured in a way that is easy to read and maintain.
 
 # Chat custom instructions
 
