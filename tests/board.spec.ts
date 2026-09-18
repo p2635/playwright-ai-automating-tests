@@ -56,7 +56,7 @@ test.describe("Board search and state-filter workflows", () => {
     );
   });
 
-  test("filters bugs by title text and excludes nonmatching titles as the query narrows", async ({
+  test("filters bugs by title text for a partial match on 'login'", async ({
     page,
   }) => {
     const searchbox = page.getByRole("search", {
@@ -78,6 +78,15 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(
       bugsTable.getByText("Payment button disabled", { exact: true })
     ).toBeHidden();
+  });
+
+  test("narrows results further as the query changes to 'fails'", async ({
+    page,
+  }) => {
+    const searchbox = page.getByRole("search", {
+      name: "Search bugs by title",
+    });
+    const bugsTable = page.getByRole("table", { name: "Bugs" });
 
     await searchbox.fill("fails");
 
@@ -89,7 +98,7 @@ test.describe("Board search and state-filter workflows", () => {
     ).toBeHidden();
   });
 
-  test("matches search case-insensitively and normalizes whitespace", async ({
+  test("matches search case-insensitively for an uppercase query", async ({
     page,
   }) => {
     const searchbox = page.getByRole("search", {
@@ -108,6 +117,15 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(
       bugsTable.getByText("Payment button disabled", { exact: true })
     ).toBeHidden();
+  });
+
+  test("normalizes leading, trailing, and repeated whitespace in the query", async ({
+    page,
+  }) => {
+    const searchbox = page.getByRole("search", {
+      name: "Search bugs by title",
+    });
+    const bugsTable = page.getByRole("table", { name: "Bugs" });
 
     await searchbox.fill("  login   fails  ");
 
@@ -119,7 +137,7 @@ test.describe("Board search and state-filter workflows", () => {
     ).toBeHidden();
   });
 
-  test("normalizes punctuation so hyphenated and plain query forms match the same titles", async ({
+  test("matches a plain query against a hyphenated title", async ({
     page,
   }) => {
     const searchbox = page.getByRole("search", {
@@ -135,6 +153,15 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(
       bugsTable.getByText("Issue with log-in", { exact: true })
     ).toBeVisible();
+  });
+
+  test("matches a hyphenated query form against the same titles as the plain form", async ({
+    page,
+  }) => {
+    const searchbox = page.getByRole("search", {
+      name: "Search bugs by title",
+    });
+    const bugsTable = page.getByRole("table", { name: "Bugs" });
 
     await searchbox.fill(" log-in ");
 
@@ -146,7 +173,7 @@ test.describe("Board search and state-filter workflows", () => {
     ).toBeVisible();
   });
 
-  test("restricts search to title text and excludes matches found only in description, owner, or severity", async ({
+  test("restricts search to title text and excludes titles absent from the query", async ({
     page,
   }) => {
     const searchbox = page.getByRole("search", {
@@ -168,6 +195,15 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(
       bugsTable.getByText("Payment button disabled", { exact: true })
     ).toBeHidden();
+  });
+
+  test("excludes matches found only in description, owner, or severity rather than the title", async ({
+    page,
+  }) => {
+    const searchbox = page.getByRole("search", {
+      name: "Search bugs by title",
+    });
+    const bugsTable = page.getByRole("table", { name: "Bugs" });
 
     await searchbox.fill("high");
 
