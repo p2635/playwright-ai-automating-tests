@@ -1,7 +1,8 @@
 .DS_Store
-node_modules
 .tmp
+.agents
 npm-debug.log
+node_modules
 
 # Build outputs
 dist
@@ -15,11 +16,8 @@ backend/dist
 backend/data
 
 # Playwright
-playwright-report/
-test-results/
-
-# Playwright
 /playwright-report/
+/test-results/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
