@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(git *)",
+      "Bash(claude *)",
+      "Edit",
+      "Read",
+      "mcp__playwright-test__*"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "env": {
+    "DEBUG": "pw:api"
+  }
+}
