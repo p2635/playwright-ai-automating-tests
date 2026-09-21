@@ -1,8 +1,59 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { getUser, loginAndOpenBoard } from "./support/auth.js";
-import { seedBoardFixtures } from "./support/board-fixtures.js";
+import {
+  createBug,
+  deleteAllBugs,
+  deleteBugIfExists,
+  type Bug,
+  type BugFixture,
+} from "./support/board-fixtures.js";
 
 const user = getUser("buggy");
+
+const boardFixtures: BugFixture[] = [
+  {
+    title: "Login fails",
+    description: "Authentication timeout",
+    severity: "HIGH",
+    owner: "buggy",
+    state: "OPEN",
+  },
+  {
+    title: "Issue with log-in",
+    description: "Login form validation",
+    severity: "MID",
+    owner: "qa-user",
+    state: "OPEN",
+  },
+  {
+    title: "Search indexing delay",
+    description: "The login owner cannot find results",
+    severity: "LOW",
+    owner: "qa-user",
+    state: "OPEN",
+  },
+  {
+    title: "Payment button disabled",
+    description: "Payment cannot be submitted",
+    severity: "HIGH",
+    owner: "login-owner",
+    state: "OPEN",
+  },
+  {
+    title: "Login fixed",
+    description: "Closed authentication issue",
+    severity: "LOW",
+    owner: "qa-user",
+    state: "CLOSED",
+  },
+  {
+    title: "Archive cleanup",
+    description: "Old records",
+    severity: "HIGH",
+    owner: "buggy",
+    state: "CLOSED",
+  },
+];
 
 function visibleTitles(bugsTable: Locator) {
   return bugsTable.locator("tbody tr td:nth-child(3)").allInnerTexts();
@@ -13,9 +64,22 @@ function visibleSeverities(bugsTable: Locator) {
 }
 
 test.describe("Board search and state-filter workflows", () => {
+  let bugs: Bug[];
+
   test.beforeEach(async ({ page, request }) => {
-    await seedBoardFixtures(request);
+    // Arrange: start from an empty board, then create the isolated fixture set for this scenario.
+    await deleteAllBugs(request);
+    bugs = [];
+    for (const fixture of boardFixtures) {
+      bugs.push(await createBug(request, fixture));
+    }
     await loginAndOpenBoard(page, user);
+  });
+
+  test.afterEach(async ({ request }) => {
+    for (const bug of bugs) {
+      await deleteBugIfExists(request, bug.id);
+    }
   });
 
   test("shows all seeded Open bugs when the board loads with search blank", async ({
