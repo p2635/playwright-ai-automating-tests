@@ -52,16 +52,22 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Record the current count of Open bugs via `GET /api/bugs`
+2. Create an Open bug titled `Delete bug test scenario 1.2 <timestamp>` via the API. Verify the bug count returned by `GET /api/bugs` is one more than the recorded count in point 1. [plan-only]
+
 **Steps:**
 
-1. Record the current count of Open bugs via `GET /api/bugs`. Create an Open bug titled `Delete bug test scenario 1.2 <timestamp>` via the API, then open the board and click its row to open the Edit modal.
-   - expect: The "Edit bug" dialog is visible with the bug's title. [12-AC1]
-   - expect: The bug count returned by `GET /api/bugs` is one more than the recorded count. [plan-only]
-2. Click Delete.
-   - expect: The dialog is closed. [12-AC2]
-   - expect: No board row shows the deleted bug's title. [12-AC2]
-   - expect: The "Open" state filter is still selected. [13-AC4]
-   - expect: A `GET /api/bugs` request no longer includes the deleted bug's ID, and the bug count is back to the recorded count. [12-AC2, plan-only]
+1. Open the board and click the newly created bug row (Preconditions 2) to open the Edit modal.
+2. Click Delete
+
+**Expected Results:**
+
+1. The dialog is closed. [12-AC2]
+2. No board row shows the deleted bug's title. [12-AC2]
+3. The "Open" state filter is still selected. [13-AC4]
+4. A `GET /api/bugs` request no longer includes the deleted bug's ID, and the bug count is back to the recorded count. [12-AC2, plan-only]
 
 #### 1.3. deletes a closed bug and closes the modal
 
