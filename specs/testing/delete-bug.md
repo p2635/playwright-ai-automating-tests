@@ -41,12 +41,19 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Create an Open bug titled `Delete bug test scenario 1.1 <timestamp>` via the API.
+
 **Steps:**
 
-1. Create an Open bug titled `Delete bug test scenario 1.1 <timestamp>` via the API, then open the board and click its row to open the Edit modal.
-   - expect: The "Edit bug" dialog is visible. [12-AC1]
-   - expect: The dialog shows a "Delete" button. [12-AC1]
-   - expect: The dialog also shows "Cancel" and "Save" buttons. [12-AC1]
+1. Open the board and click the newly created bug row (Preconditions 1) to open the Edit modal.
+
+**Expected Results:**
+
+1. The "Edit bug" dialog is visible. [12-AC1]
+2. The dialog shows a "Delete" button. [12-AC1]
+3. The dialog also shows "Cancel" and "Save" buttons. [12-AC1]
 
 #### 1.2. deletes an open bug and closes the modal
 
@@ -73,55 +80,82 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Switch the board to the "Closed" filter and record the current count of Closed bugs via `GET /api/bugs`.
+2. Create a Closed bug titled `Delete bug test scenario 1.3 <timestamp>` via the API. Verify the Closed bug count returned by `GET /api/bugs` is one more than the recorded count in point 1. [plan-only]
+
 **Steps:**
 
-1. Switch the board to the "Closed" filter and record the current count of Closed bugs via `GET /api/bugs`. Create a Closed bug titled `Delete bug test scenario 1.3 <timestamp>` via the API, then click the bug's row to open the Edit modal.
-   - expect: The "Edit bug" dialog is visible with the bug's title and State set to "Closed". [12-AC1]
-   - expect: The bug count returned by `GET /api/bugs` for Closed bugs is one more than the recorded count. [plan-only]
+1. Click the newly created bug row (Preconditions 2) to open the Edit modal.
 2. Click Delete.
-   - expect: The dialog is closed. [12-AC2]
-   - expect: No board row under the "Closed" filter shows the deleted bug's title. [12-AC2]
-   - expect: The "Closed" state filter is still selected. [13-AC4]
-   - expect: A `GET /api/bugs` request no longer includes the deleted bug's ID, and the Closed bug count is back to the recorded count. [12-AC2, plan-only]
+
+**Expected Results:**
+
+1. The dialog is closed. [12-AC2]
+2. No board row under the "Closed" filter shows the deleted bug's title. [12-AC2]
+3. The "Closed" state filter is still selected. [13-AC4]
+4. A `GET /api/bugs` request no longer includes the deleted bug's ID, and the Closed bug count is back to the recorded count. [12-AC2, plan-only]
 
 #### 1.4. deleted bug does not reappear after reload
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Create an Open bug titled `Delete bug test scenario 1.4 <timestamp>` via the API.
+
 **Steps:**
 
-1. Create an Open bug titled `Delete bug test scenario 1.4 <timestamp>` via the API, open its Edit modal, and click Delete.
-   - expect: The dialog is closed and the bug is removed from the board. [12-AC2]
-2. Reload the page.
-   - expect: No board row shows the deleted bug's title. [12-AC2]
+1. Open the board and click the newly created bug row (Preconditions 1) to open the Edit modal.
+2. Click Delete.
+3. Reload the page.
+
+**Expected Results:**
+
+1. The dialog is closed and the bug is removed from the board. [12-AC2]
+2. No board row shows the deleted bug's title after reload. [12-AC2]
 
 #### 1.5. cancel does not delete the bug
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Record the current bug count via `GET /api/bugs`.
+2. Create an Open bug titled `Delete bug test scenario 1.5 <timestamp>` via the API. Verify the bug count returned by `GET /api/bugs` is one more than the recorded count in point 1. [plan-only]
+
 **Steps:**
 
-1. Record the current bug count via `GET /api/bugs`. Create an Open bug titled `Delete bug test scenario 1.5 <timestamp>` via the API, then open its Edit modal.
-   - expect: The "Edit bug" dialog is visible with the bug's title. [09-AC6]
+1. Open the board and click the newly created bug row (Preconditions 2) to open the Edit modal.
 2. Click Cancel without clicking Delete.
-   - expect: The dialog is closed. [09-AC6]
-   - expect: The board still shows a row with the bug's title. [09-AC6]
-   - expect: The bug count returned by `GET /api/bugs` is unchanged from the count recorded after creation (i.e. the bug was not removed). [09-AC6, plan-only]
+
+**Expected Results:**
+
+1. The dialog is closed. [09-AC6]
+2. The board still shows a row with the bug's title. [09-AC6]
+3. The bug count returned by `GET /api/bugs` is unchanged from the count recorded after creation (i.e. the bug was not removed). [09-AC6, plan-only]
 
 #### 1.6. deleting one bug leaves other bugs on the board
 
 **File:** To be created
 
+**Preconditions:**
+
+1. Record the current bug count via `GET /api/bugs`.
+2. Create two Open bugs titled `Delete bug test scenario 1.6a <timestamp>` and `Delete bug test scenario 1.6b <timestamp>` via the API. Verify the bug count returned by `GET /api/bugs` is two more than the recorded count in point 1. [plan-only]
+
 **Steps:**
 
-1. Record the current bug count via `GET /api/bugs`. Create two Open bugs titled `Delete bug test scenario 1.6a <timestamp>` and `Delete bug test scenario 1.6b <timestamp>` via the API. Open the Edit modal for the first bug.
-   - expect: The "Edit bug" dialog is visible with the first bug's title. [12-AC1]
-   - expect: The bug count returned by `GET /api/bugs` is two more than the recorded count. [plan-only]
+1. Open the board and click the row for the first bug (Preconditions 2) to open the Edit modal.
 2. Click Delete.
-   - expect: The dialog is closed. [12-AC2]
-   - expect: No board row shows the first bug's title. [12-AC2]
-   - expect: A board row still shows the second bug's title. [12-AC2]
-   - expect: The bug count returned by `GET /api/bugs` is one more than the originally recorded count (only the first bug was removed). [12-AC2, plan-only]
+
+**Expected Results:**
+
+1. The dialog is closed. [12-AC2]
+2. No board row shows the first bug's title. [12-AC2]
+3. A board row still shows the second bug's title. [12-AC2]
+4. The bug count returned by `GET /api/bugs` is one more than the originally recorded count (only the first bug was removed). [12-AC2, plan-only]
 
 ## Out of Scope (deferred)
 
