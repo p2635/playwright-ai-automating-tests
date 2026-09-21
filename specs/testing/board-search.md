@@ -10,7 +10,7 @@ This plan covers end-to-end board searching through the UI. Search is title-only
 
 Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`. Each scenario should start from a fresh or reset data state so scenarios remain independent.
 
-Prepare deterministic bugs through the supported fixture/setup mechanism before visiting the board. Include at least these records, with unique IDs and descriptions where shown:
+Following the `beforeEach`/`afterEach` pattern used by the delete-bug tests, each scenario's `beforeEach` must first clear the board via the `deleteAllBugs` helper (`tests/support/board-fixtures.ts`), then create the fixture set below individually via `createBug`, matching the `BugFixture` shape over the backend REST API. The matching `afterEach` must delete each created bug via `deleteBugIfExists`, so setup and teardown stay symmetric with the delete-bug tests rather than relying on a bulk seed/reset helper. Include at least these records, with unique IDs and descriptions where shown:
 
 - Open: title `Login fails`, description `Authentication timeout`, severity `HIGH`, owner `buggy`.
 - Open: title `Issue with log-in`, description `Login form validation`, severity `MID`, owner `qa-user`.

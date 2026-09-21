@@ -12,7 +12,7 @@ BuggyBoard is a web-based bug tracker. An authenticated user reaches the board a
 
 Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`.
 
-Each scenario must create the bug(s) it deletes as part of its own setup, via the backend REST API (`POST http://localhost:3000/api/bugs`, matching the `BugFixture` shape and `seedBoardFixtures` helper in `tests/support/board-fixtures.ts`), so every test starts from a known, isolated bug rather than relying on pre-existing board data. Do not delete or reset unrelated bugs already on the board.
+Each scenario must create the bug(s) it deletes as part of its own setup, via the backend REST API (`POST http://localhost:3000/api/bugs`, matching the `BugFixture` shape and the `createBug`/`deleteBugIfExists` helpers in `tests/support/board-fixtures.ts`), so every test starts from a known, isolated bug rather than relying on pre-existing board data. Do not delete or reset unrelated bugs already on the board.
 
 Give every created bug a descriptive, unique title that identifies the scenario and run, e.g. `Delete bug test scenario 1.2 <ISO timestamp>`, so a human reviewing a test report or the database can trace a leftover or failed-deletion row back to the exact scenario that created it.
 
