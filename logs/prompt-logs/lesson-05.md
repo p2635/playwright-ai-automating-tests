@@ -194,3 +194,79 @@ Refactoring board-search tests to match the delete-bug `beforeEach`/`afterEach` 
 > **Assistant:** **Summary:** Refactored `tests/board-search.spec.ts` to match the delete-bug pattern: `beforeEach` now clears the board with a new `deleteAllBugs` helper and creates the fixture bugs individually via `createBug`, and `afterEach` deletes them via `deleteBugIfExists`. Removed the now-unused `seedBoardFixtures`/`boardFixtures` export from `tests/support/board-fixtures.ts`, and updated both `specs/testing/board-search.md` and `specs/testing/delete-bug.md` to describe the new shared helpers/pattern.
 
 </details>
+
+## Refactor the spec files
+
+<details markdown="1">
+<summary>Conversation with Claude Haiku 4.5: Page Object Model migration for Playwright tests (click to expand)</summary>
+
+> **User:** Please create a new md file under specs/engineering called `test-automation-patterns.md`. This should include information to implement the Page Object Model for new and refactored playwright tests. Please also update @specs/engineering/README.md  to reflect this change. Any questions before you begin?
+>
+> **Claude:** Quick clarifying questions before I write this up.
+>
+> 1. Where do Page Object classes/files should live in the repo? Options: tests/pages/ (Recommended), src/pages/, or ask me to check repo structure first
+> 2. Should the spec mandate a base page class / fixtures pattern (e.g. Playwright fixtures for POM injection) or just plain POM classes instantiated per test? Options: Plain POM classes (Recommended), Playwright fixtures pattern, or Help me understand the difference before we start
+> 3. Any existing tests that should be called out as examples/migration targets, or is this purely forward-looking guidance for new tests? Options: Forward-looking only (Recommended), Include migration candidates
+>
+> **User:** (Answered: tests/pages/ location; wants to understand the difference between plain POM and fixtures before choosing; wants to include migration candidates)
+>
+> **Claude:** Quick explainer:
+>
+> **Plain POM classes** — each test file does `const loginPage = new LoginPage(page);` at the top (or in a `beforeEach`). Simple, explicit, no extra setup. Downside: repeated instantiation boilerplate in every test file.
+>
+> **Playwright fixtures pattern** — you extend Playwright's `test` object (via `test.extend()`) so page objects are auto-created and injected as parameters, e.g. `test('...', async ({ loginPage }) => { ... })`. No manual instantiation, and you can add setup/teardown logic (e.g. auto-navigate) per fixture. Slightly more setup work upfront (a fixtures file), but scales better and is the more "idiomatic" modern Playwright approach.
+>
+> For a new/refactoring standard, most teams settle on **fixtures** once they have more than a couple page objects, since it removes repeated boilerplate across every test file. Given you're setting a pattern for future work, I'd lean fixtures — but plain POM is simpler if the suite is small and you want lower ceremony.
+>
+> Which POM instantiation style should the spec mandate? Options: Playwright fixtures (Recommended), Plain POM classes
+>
+> **User:** (Answered: Playwright fixtures Recommended)
+>
+> **Claude:** Now let me look at the existing test structure to identify migration candidates and match conventions.
+>
+> (After inspecting the codebase, I identified: tests/board-search.spec.ts, six tests/delete-bug/*.spec.ts files, tests-vibed/login.spec.ts, and tests-vibed/bugs.spec.ts as migration candidates)
+>
+> Created test-automation-patterns.md covering:
+>
+> - Why POM (centralization of locators and interactions)
+> - File layout under `tests/pages/`
+> - Page object conventions (one class per page, constructor takes Page, methods express domain language)
+> - Fixtures pattern explanation with example (test.extend())
+> - Migration candidates (board-search, delete-bug suite, tests-vibed files)
+> - Guidance to refactor incrementally when touching specs for other reasons
+>
+> Updated README.md to list the new spec.
+>
+> **User:** Please implement the migration in this doc, then remove this section from the markdown file (since it won't be relevant anymore).
+>
+> **Claude:** I'll now implement the Page Object Model migration across all identified test files:
+>
+> 1. Created page object classes:
+>    - `tests/pages/login.page.ts` — LoginPage with usernameInput, passwordInput, loginButton, and login() method
+>    - `tests/pages/board.page.ts` — BoardPage with table, search, filter, sort locators and helper methods (rowByTitle, visibleTitles, openBugByTitle, etc.)
+>    - `tests/pages/edit-bug-dialog.page.ts` — EditBugDialogPage wrapping the Edit modal's delete/cancel/save buttons
+>    - `tests/pages/create-bug-dialog.page.ts` — CreateBugDialogPage with form inputs and fillAndSave() method
+>
+> 2. Created `tests/pages/fixtures.ts` using test.extend() to inject all four page objects into the test context
+>
+> 3. Migrated all spec files:
+>    - tests/board-search.spec.ts: 14 tests now use boardPage fixture
+>    - tests/delete-bug/1.1–1.6: all six files now use loginPage and boardPage/editBugDialog fixtures
+>    - tests-vibed/login.spec.ts and bugs.spec.ts: migrated to use loginPage, boardPage, createBugDialog, editBugDialog fixtures
+>
+> 4. Simplified tests/support/auth.ts by removing the now-unused loginAndOpenBoard() helper (logic moved into LoginPage.login())
+>
+> 5. Updated imports to use .js extensions per project convention
+>
+> 6. Removed the "Migration candidates" section from test-automation-patterns.md
+>
+> Verified:
+>
+> - TypeScript: clean with tsc --noEmit
+> - Linting: clean with eslint
+> - Runtime: Ran Playwright against dev server
+>   - delete-bug suite: 6/6 passed ✓
+>   - tests-vibed suite: 3/3 passed ✓
+>   - board-search: 7 pre-existing test failures (confirmed these fail on the original unmigrated file too — app/data flakiness unrelated to this refactor)
+
+</details>
