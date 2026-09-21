@@ -22,3 +22,6 @@ backend/data
 /playwright/.cache/
 /playwright/.auth/
 .playwright-mcp
+
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
