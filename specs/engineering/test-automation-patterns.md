@@ -118,21 +118,3 @@ test("edit modal shows a delete button", async ({ loginPage, boardPage }) => {
 
 Non-UI helpers (`support/auth.ts`, `support/board-fixtures.ts`) stay as plain imported functions
 — fixtures are for page objects, not every helper.
-
-## Migration candidates
-
-Existing specs that talk to locators directly and are good candidates to refactor onto this
-pattern next time they're touched:
-
-- [tests/board-search.spec.ts](../../tests/board-search.spec.ts) — repeats board table locators
-  (`getByRole("table", { name: "Bugs" })`) that a `BoardPage` object would centralize.
-- [tests/delete-bug/*.spec.ts](../../tests/delete-bug/) (six files) — each re-derives the "open
-  bug via table row" and "Edit bug dialog" locators inline; these map directly onto a `BoardPage`
-  and an `EditBugDialogPage` object.
-- [tests-vibed/login.spec.ts](../../tests-vibed/login.spec.ts) — duplicates the login flow that
-  `support/auth.ts` already wraps for API-driven setup; the UI login path itself should move into
-  a `LoginPage`.
-- [tests-vibed/bugs.spec.ts](../../tests-vibed/bugs.spec.ts) — same board/bug locators as above.
-
-Don't batch-migrate these in one PR. Refactor a spec onto POM when you're already changing it for
-another reason, so the diff stays reviewable and tied to real work.
