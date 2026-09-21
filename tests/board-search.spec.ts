@@ -1,5 +1,5 @@
-import { test, expect, type Locator } from "@playwright/test";
-import { getUser, loginAndOpenBoard } from "./support/auth.js";
+import { test, expect } from "./pages/fixtures.js";
+import { getUser } from "./support/auth.js";
 import {
   createBug,
   deleteAllBugs,
@@ -55,25 +55,17 @@ const boardFixtures: BugFixture[] = [
   },
 ];
 
-function visibleTitles(bugsTable: Locator) {
-  return bugsTable.locator("tbody tr td:nth-child(3)").allInnerTexts();
-}
-
-function visibleSeverities(bugsTable: Locator) {
-  return bugsTable.locator("tbody tr td:nth-child(2)").allInnerTexts();
-}
-
 test.describe("Board search and state-filter workflows", () => {
   let bugs: Bug[];
 
-  test.beforeEach(async ({ page, request }) => {
+  test.beforeEach(async ({ loginPage, request }) => {
     // Arrange: start from an empty board, then create the isolated fixture set for this scenario.
     await deleteAllBugs(request);
     bugs = [];
     for (const fixture of boardFixtures) {
       bugs.push(await createBug(request, fixture));
     }
-    await loginAndOpenBoard(page, user);
+    await loginPage.login(user);
   });
 
   test.afterEach(async ({ request }) => {
@@ -83,33 +75,18 @@ test.describe("Board search and state-filter workflows", () => {
   });
 
   test("shows all seeded Open bugs when the board loads with search blank", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await expect(boardPage.searchbox).toHaveValue("");
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Search indexing delay")).toBeVisible();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fixed")).toBeHidden();
+    await expect(boardPage.noBugsMatchedMessage).toBeHidden();
+    await expect(boardPage.noBugsMessage).toBeHidden();
 
-    await expect(searchbox).toHaveValue("");
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Search indexing delay", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeHidden();
-    await expect(page.getByText("No bugs matched.")).toBeHidden();
-    await expect(page.getByText("No bugs.")).toBeHidden();
-
-    const titles = await visibleTitles(bugsTable);
+    const titles = await boardPage.visibleTitles();
     expect(titles.sort()).toEqual(
       [
         "Login fails",
@@ -121,320 +98,168 @@ test.describe("Board search and state-filter workflows", () => {
   });
 
   test("filters bugs by title text for a partial match on 'login'", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.pressSequentially("login");
 
-    await searchbox.pressSequentially("login");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Search indexing delay", { exact: true })
-    ).toBeHidden();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Search indexing delay")).toBeHidden();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
   test("narrows results further as the query changes to 'fails'", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("fails");
 
-    await searchbox.fill("fails");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
   });
 
   test("matches search case-insensitively for an uppercase query", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("LOGIN");
 
-    await searchbox.fill("LOGIN");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
   test("normalizes leading, trailing, and repeated whitespace in the query", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("  login   fails  ");
 
-    await searchbox.fill("  login   fails  ");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
   });
 
   test("matches a plain query against a hyphenated title", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("login");
 
-    await searchbox.fill("login");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
   });
 
   test("matches a hyphenated query form against the same titles as the plain form", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill(" log-in ");
 
-    await searchbox.fill(" log-in ");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
   });
 
   test("restricts search to title text and excludes titles absent from the query", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("login");
 
-    await searchbox.fill("login");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Search indexing delay", { exact: true })
-    ).toBeHidden();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Search indexing delay")).toBeHidden();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
   test("excludes matches found only in description, owner, or severity rather than the title", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("high");
 
-    await searchbox.fill("high");
-
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
   test('shows the "No bugs matched." message when the query matches no titles', async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("zzzz-no-title-match");
 
-    await searchbox.fill("zzzz-no-title-match");
-
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeHidden();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeHidden();
-    await expect(page.getByText("No bugs matched.")).toBeVisible();
-    await expect(page.getByText("No bugs.", { exact: true })).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeHidden();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
+    await expect(boardPage.noBugsMatchedMessage).toBeVisible();
+    await expect(boardPage.noBugsMessage).toBeHidden();
   });
 
   test("clears the search with the X control and restores the active-state board", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const clearButton = page.getByRole("button", { name: "Clear search" });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
+    await boardPage.searchbox.fill("login");
 
-    await searchbox.fill("login");
+    await expect(boardPage.clearSearchButton).toBeEnabled();
+    await expect(boardPage.rowByTitle("Search indexing delay")).toBeHidden();
 
-    await expect(clearButton).toBeEnabled();
-    await expect(
-      bugsTable.getByText("Search indexing delay", { exact: true })
-    ).toBeHidden();
+    await boardPage.clearSearchButton.click();
 
-    await clearButton.click();
-
-    await expect(searchbox).toHaveValue("");
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Search indexing delay", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Payment button disabled", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeHidden();
-    await expect(page.getByText("No bugs matched.")).toBeHidden();
+    await expect(boardPage.searchbox).toHaveValue("");
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Search indexing delay")).toBeVisible();
+    await expect(boardPage.rowByTitle("Payment button disabled")).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fixed")).toBeHidden();
+    await expect(boardPage.noBugsMatchedMessage).toBeHidden();
   });
 
   test("preserves sort order and the aria-sort indicator while searching", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
-    const titleSortButton = page.getByRole("button", { name: "Title" });
-    const severitySortButton = page.getByRole("button", { name: "Severity" });
-    const titleColumnHeader = page.getByRole("columnheader", {
-      name: "Title",
-    });
-    const severityColumnHeader = page.getByRole("columnheader", {
-      name: "Severity",
-    });
+    await boardPage.titleSortButton.click();
 
-    await titleSortButton.click();
-
-    await expect(titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
-    expect(await visibleTitles(bugsTable)).toEqual([
+    await expect(boardPage.titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(await boardPage.visibleTitles()).toEqual([
       "Issue with log-in",
       "Login fails",
       "Payment button disabled",
       "Search indexing delay",
     ]);
 
-    await searchbox.fill("login");
+    await boardPage.searchbox.fill("login");
 
-    await expect(titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
-    expect(await visibleTitles(bugsTable)).toEqual([
-      "Issue with log-in",
-      "Login fails",
-    ]);
+    await expect(boardPage.titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(await boardPage.visibleTitles()).toEqual(["Issue with log-in", "Login fails"]);
 
-    await severitySortButton.click();
-    await searchbox.fill("log");
+    await boardPage.severitySortButton.click();
+    await boardPage.searchbox.fill("log");
 
-    await expect(severityColumnHeader).toHaveAttribute(
+    await expect(boardPage.severityColumnHeader).toHaveAttribute(
       "aria-sort",
       /ascending|descending/
     );
     // A fresh column click always starts ascending: LOW(0) < MID(1) < HIGH(2).
     // "log" matches Open titles "Issue with log-in" (MID) and "Login fails" (HIGH).
-    expect(await visibleSeverities(bugsTable)).toEqual(["MID", "HIGH"]);
+    expect(await boardPage.visibleSeverities()).toEqual(["MID", "HIGH"]);
   });
 
   test("combines Open and Closed state filtering with an active title search", async ({
-    page,
+    boardPage,
   }) => {
-    const searchbox = page.getByRole("search", {
-      name: "Search bugs by title",
-    });
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
-    const closedButton = page.getByRole("button", { name: "Closed" });
-    const openButton = page.getByRole("button", { name: "Open" });
+    await boardPage.closedFilterButton.click();
 
-    await closedButton.click();
+    await expect(boardPage.rowByTitle("Login fixed")).toBeVisible();
+    await expect(boardPage.rowByTitle("Archive cleanup")).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fails")).toBeHidden();
 
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Archive cleanup", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeHidden();
+    await boardPage.searchbox.fill("login");
 
-    await searchbox.fill("login");
+    await expect(boardPage.rowByTitle("Login fixed")).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fails")).toBeHidden();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
 
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeHidden();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeHidden();
+    await boardPage.openFilterButton.click();
 
-    await openButton.click();
+    await expect(boardPage.searchbox).toHaveValue("login");
+    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
+    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fixed")).toBeHidden();
 
-    await expect(searchbox).toHaveValue("login");
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Issue with log-in", { exact: true })
-    ).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeHidden();
+    await boardPage.searchbox.fill("zzzz-no-title-match");
+    await boardPage.closedFilterButton.click();
 
-    await searchbox.fill("zzzz-no-title-match");
-    await closedButton.click();
-
-    await expect(page.getByText("No bugs matched.")).toBeVisible();
-    await expect(
-      bugsTable.getByText("Login fixed", { exact: true })
-    ).toBeHidden();
-    await expect(
-      bugsTable.getByText("Login fails", { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.noBugsMatchedMessage).toBeVisible();
+    await expect(boardPage.rowByTitle("Login fixed")).toBeHidden();
+    await expect(boardPage.rowByTitle("Login fails")).toBeHidden();
   });
 });

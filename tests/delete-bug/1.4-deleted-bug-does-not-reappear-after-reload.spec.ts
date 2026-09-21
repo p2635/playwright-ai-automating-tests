@@ -1,7 +1,7 @@
 // spec: specs/testing/delete-bug.md
 // seed: tests/seed.spec.ts
-import { test, expect } from "@playwright/test";
-import { getUser, loginAndOpenBoard } from "../support/auth.js";
+import { test, expect } from "../pages/fixtures.js";
+import { getUser } from "../support/auth.js";
 import { createBug, deleteBugIfExists, type Bug } from "../support/board-fixtures.js";
 
 const user = getUser("buggy");
@@ -9,7 +9,7 @@ const user = getUser("buggy");
 test.describe("Delete bug workflow", () => {
   let bug: Bug;
 
-  test.beforeEach(async ({ page, request }) => {
+  test.beforeEach(async ({ loginPage, request }) => {
     // Arrange: create an isolated Open bug for this scenario and log in.
     bug = await createBug(request, {
       title: `Delete bug test scenario 1.4 ${new Date().toISOString()}`,
@@ -18,29 +18,28 @@ test.describe("Delete bug workflow", () => {
       owner: "buggy",
       state: "OPEN",
     });
-    await loginAndOpenBoard(page, user);
+    await loginPage.login(user);
   });
 
   test.afterEach(async ({ request }) => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("deleted bug does not reappear after reload", async ({ page }) => {
-    const bugsTable = page.getByRole("table", { name: "Bugs" });
-    await bugsTable.getByText(bug.title, { exact: true }).click();
-    const dialog = page.getByRole("dialog", { name: /Edit bug/ });
-    await expect(dialog).toBeVisible();
+  test("deleted bug does not reappear after reload", async ({
+    page,
+    boardPage,
+    editBugDialog,
+  }) => {
+    await boardPage.openBugByTitle(bug.title);
+    await editBugDialog.expectVisible();
 
     // Act: delete the bug, then reload the page.
-    await dialog.getByRole("button", { name: "Delete" }).click();
-    await expect(dialog).toBeHidden();
-    await expect(bugsTable.getByText(bug.title, { exact: true })).toBeHidden();
+    await editBugDialog.delete();
+    await expect(boardPage.rowByTitle(bug.title)).toBeHidden();
     await page.reload();
 
     // Assert: the bug is still absent from the board after reload.
-    await expect(page.getByRole("table", { name: "Bugs" })).toBeVisible();
-    await expect(
-      page.getByRole("table", { name: "Bugs" }).getByText(bug.title, { exact: true })
-    ).toBeHidden();
+    await expect(boardPage.bugsTable).toBeVisible();
+    await expect(boardPage.rowByTitle(bug.title)).toBeHidden();
   });
 });
