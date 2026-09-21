@@ -1,12 +1,12 @@
-# Learning Journey: Playwright Test Automation
+# Learning Journey: Playwright AI Test Automation
 
 This document tracks my learning and growth in test automation with Playwright, including key concepts, patterns, decisions, and lessons learned.
 
 ## Overview
 
-- **Goal**: Master Playwright for automated browser testing and understand best practices in test automation
-- **Duration**: [Start date] — Present
-- **Key Focus Areas**: Selectors & locators, test organization, fixtures, error handling
+- **Goal**: Learn how to use Playwright with GenAI agents and CLI
+- **Duration**: 11 September 2026 — Present
+- **Key Focus Areas**: Test Automation — AI-Assisted Playwright
 
 ## Learning Path
 
