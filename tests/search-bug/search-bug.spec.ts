@@ -1,12 +1,12 @@
-import { test, expect } from "./pages/fixtures.js";
-import { getUser } from "./support/auth.js";
+import { test, expect } from "../pages/fixtures.js";
+import { getUser } from "../support/auth.js";
 import {
   createBug,
   deleteAllBugs,
   deleteBugIfExists,
   type Bug,
   type BugFixture,
-} from "./support/board-fixtures.js";
+} from "../support/board-fixtures.js";
 
 const user = getUser("buggy");
 
