@@ -16,7 +16,7 @@ This document tracks my learning and growth in test automation with Playwright, 
 
 ## Key Takeaways
 
-*Add your biggest insights here as you progress*
+Add your biggest insights here as you progress.
 
 - [To be filled in with major learnings]
 - [Patterns that surprised you]
