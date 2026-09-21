@@ -120,3 +120,4 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 ## Out of Scope (deferred)
 
 - Verifying that a deleted bug's title can no longer be found via the board search field. To be addressed in a future revision of this plan.
+- This test plan is the latest format and should be applied to other test plans for consistency e.g. markdown lists, header info (version, date generated and reviewed)
