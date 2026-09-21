@@ -4,7 +4,7 @@ This directory contains curated documentation of my learning journey in Playwrig
 
 ## Structure
 
-```
+```text
 learning/
 ├── README.md (this file)
 ├── playwright-fundamentals/
@@ -23,11 +23,13 @@ learning/
 ## What's Here
 
 ### [Playwright Fundamentals](./playwright-fundamentals/)
+
 - **Concepts**: Selectors & locators, page objects, fixtures, async/await patterns
 - **Patterns**: How I structure page objects, handle waits, manage test data
 - **Troubleshooting**: Common errors, root causes, solutions
 
 ### [Test Automation Strategy](./test-automation-strategy/)
+
 - **Best Practices**: What works, what doesn't, why
 - **Lessons Learned**: Mistakes made, insights gained
 - **Case Studies**: Real tests I debugged and improved
