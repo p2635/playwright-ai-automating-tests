@@ -30,7 +30,7 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("deletes an open bug and closes the modal", async ({
+  test("should delete an open bug and close the modal", async ({
     boardPage,
     editBugDialog,
     request,

@@ -40,7 +40,7 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bugB.id);
   });
 
-  test("deleting one bug leaves other bugs on the board", async ({
+  test("should leave other bugs on the board when one is deleted", async ({
     boardPage,
     editBugDialog,
     request,

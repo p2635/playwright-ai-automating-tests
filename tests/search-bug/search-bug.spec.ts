@@ -74,7 +74,7 @@ test.describe("Board search and state-filter workflows", () => {
     }
   });
 
-  test("shows all seeded Open bugs when the board loads with search blank", async ({
+  test("should show all seeded Open bugs when the board loads with search blank", async ({
     boardPage,
   }) => {
     await expect(boardPage.searchbox).toHaveValue("");
@@ -97,7 +97,7 @@ test.describe("Board search and state-filter workflows", () => {
     );
   });
 
-  test("filters bugs by title text for a partial match on 'login'", async ({
+  test("should filter bugs by title text for a partial match on 'login'", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.pressSequentially("login");
@@ -108,7 +108,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
-  test("narrows results further as the query changes to 'fails'", async ({
+  test("should filter bugs by title text for a partial match on 'fails'", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("fails");
@@ -117,7 +117,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
   });
 
-  test("matches search case-insensitively for an uppercase query", async ({
+  test("should match search case-insensitively for an uppercase query", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("LOGIN");
@@ -127,7 +127,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
-  test("normalizes leading, trailing, and repeated whitespace in the query", async ({
+  test("should normalize leading, trailing, and repeated whitespace in the query", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("  login   fails  ");
@@ -136,7 +136,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
   });
 
-  test("matches a plain query against a hyphenated title", async ({
+  test("should match a plain query against a hyphenated title", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("login");
@@ -145,7 +145,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
   });
 
-  test("matches a hyphenated query form against the same titles as the plain form", async ({
+  test("should match a hyphenated query form against the same titles as the plain form", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill(" log-in ");
@@ -154,7 +154,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
   });
 
-  test("restricts search to title text and excludes titles absent from the query", async ({
+  test("should restrict search to title text and exclude titles absent from the query", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("login");
@@ -165,7 +165,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
-  test("excludes matches found only in description, owner, or severity rather than the title", async ({
+  test("should exclude matches found only in description, owner, or severity rather than the title", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("high");
@@ -173,7 +173,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
   });
 
-  test('shows the "No bugs matched." message when the query matches no titles', async ({
+  test('should show the "No bugs matched." message when the query matches no titles', async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("zzzz-no-title-match");
@@ -184,7 +184,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.noBugsMessage).toBeHidden();
   });
 
-  test("clears the search with the X control and restores the active-state board", async ({
+  test("should clear the search with the X control and restore the active-state board", async ({
     boardPage,
   }) => {
     await boardPage.searchbox.fill("login");
@@ -203,7 +203,7 @@ test.describe("Board search and state-filter workflows", () => {
     await expect(boardPage.noBugsMatchedMessage).toBeHidden();
   });
 
-  test("preserves sort order and the aria-sort indicator while searching", async ({
+  test("should preserve sort order and the aria-sort indicator while searching", async ({
     boardPage,
   }) => {
     await boardPage.titleSortButton.click();
@@ -242,7 +242,7 @@ test.describe("Board search and state-filter workflows", () => {
     expect(await boardPage.visibleSeverities()).toEqual(["MID", "HIGH"]);
   });
 
-  test("combines Open and Closed state filtering with an active title search", async ({
+  test("should combine Open and Closed state filtering with an active title search", async ({
     boardPage,
   }) => {
     await boardPage.closedFilterButton.click();

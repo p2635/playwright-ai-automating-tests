@@ -29,7 +29,7 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("deleted bug does not reappear after reload", async ({
+  test("should not reappear after page reload", async ({
     page,
     boardPage,
     editBugDialog,

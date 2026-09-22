@@ -29,7 +29,7 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("edit modal shows a delete button", async ({
+  test("should show a delete button in the edit modal", async ({
     boardPage,
     editBugDialog,
   }) => {

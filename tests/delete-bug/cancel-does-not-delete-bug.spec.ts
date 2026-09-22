@@ -30,7 +30,7 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("cancel does not delete the bug", async ({
+  test("should not delete the bug when cancel is clicked", async ({
     boardPage,
     editBugDialog,
     request,
