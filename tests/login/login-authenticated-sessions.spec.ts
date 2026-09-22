@@ -6,6 +6,17 @@ import { getUser } from "../support/auth.js";
 const user = getUser("buggy");
 
 test.describe("Authenticated session behavior", () => {
+  test("should redirect an authenticated user visiting the login page to the board", async ({
+    page,
+    loginPage,
+  }) => {
+    await loginPage.login(user);
+
+    await page.goto("/login");
+
+    await expect(page).toHaveURL(/\/board$/);
+  });
+
   test("should remain authenticated after refreshing the board page", async ({
     page,
     loginPage,

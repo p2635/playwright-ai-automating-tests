@@ -15,3 +15,13 @@ test.describe("Login page display", () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 });
+
+test.describe("Route protection", () => {
+  test("should redirect an unauthenticated user from the board page to login", async ({
+    page,
+  }) => {
+    await page.goto("/board");
+
+    await expect(page).toHaveURL(/\/login$/);
+  });
+});
