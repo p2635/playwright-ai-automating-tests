@@ -34,6 +34,8 @@ test.describe("Delete bug workflow", () => {
     editBugDialog,
   }) => {
     // Act: open the Edit modal for the newly created bug.
+    await expect(boardPage.bugsTable).toBeVisible();
+    await expect(boardPage.rowByTitle(bug.title)).toBeVisible();
     await boardPage.openBugByTitle(bug.title);
 
     // Assert: the dialog and its action buttons are visible.
