@@ -419,3 +419,97 @@ All test descriptions across 8 spec files were updated to follow BDD-style namin
 > All describe blocks have been kept consistent and clear. Feel free to adjust any of these if they don't quite match your preference—just let me know which ones you'd like to tweak!
 
 </details>
+
+## Reorganize test plans for business readability
+
+Test plan files (create-bug.md, board-search.md, delete-bug.md) were restructured to separate business-facing content from technical implementation details, making them more accessible to non-technical stakeholders like product managers and QA. All three files now follow a consistent pattern: Feature Overview → Test Scenarios → Technical Information, with metadata and fixture guidance moved to the bottom section.
+
+<details markdown="1">
+<summary>Conversation with Claude Haiku 4.5 (click to expand)</summary>
+
+> **User:** Please review them again and move any technical testing information (such as seed/fixture guidance) into its own section called 'Technical Information' (at the bottom of the document). Most of the test plan should be readable to other non-technical team members.
+>
+> **Claude (reasoning):** The user wants me to make the test plans more readable for non-technical audiences. This means:
+> 1. Moving technical sections (Seed/Fixture Guidance, Locator Guidance, Verification Commands, Spec Traceability) to the bottom in a "Technical Information" section
+> 2. Removing technical metadata like **File:** and **Seed:** from within test scenarios
+> 3. Keeping test scenarios focused on what's being tested, not how it's implemented
+>
+> I should read all three files, understand the current structure, then reorganize them consistently.
+>
+> **Claude:** I reviewed the three test plan files and identified the technical sections that need to be moved. The structure across all three files is similar but board-search.md and delete-bug.md have more extensive technical content.
+>
+> **Reorganization approach:**
+> 1. **create-bug.md** — already fairly clean; remove **File:** metadata from each test scenario and add a minimal "Technical Information" section with test location and seed details
+> 2. **board-search.md** — move Seed/Fixture Guidance, Locator Guidance, Verification Commands, and Spec Traceability Legend to Technical Information; remove **File:** and **Seed:** from test scenarios
+> 3. **delete-bug.md** — move Seed/Fixture Guidance, Locator Guidance, and Spec Traceability Legend to Technical Information; remove **File:** and **Seed:** metadata
+>
+> This keeps the main content (Feature Overview → Test Scenarios) business-focused while preserving all technical details in a separate section for engineers.
+>
+> **Result:** All three files have been successfully reorganized:
+> - **create-bug.md**: Renamed section headers to title case, removed **File:** entries, added Technical Information section with seed/setup details
+> - **board-search.md**: Moved 4 technical sections to bottom, removed **File:** and **Seed:** metadata, kept test scenarios clean and narrative-focused
+> - **delete-bug.md**: Moved 3 technical sections to bottom, removed **File:** metadata, capitalized test scenario titles for consistency
+>
+> The new structure makes the test plans readable for non-technical stakeholders by putting business logic first (Feature Overview + Test Scenarios) and relegating implementation details (locators, fixture patterns, traceability codes) to the Technical Information section at the end. This keeps the main document flow focused on *what* is being tested rather than *how* or *where*.
+
+</details>
+
+## Debug and fix search normalization bug
+
+Seven tests in the search-bug spec were failing because the app's `normalizeForSearch` function was converting punctuation (including hyphens) to spaces instead of stripping them entirely. Investigation revealed a genuine bug in the frontend source code: `"Issue with log-in"` normalized to `"issue with log in"` (spaces preserved) while the query `"login"` stayed as one word, so substring matching failed. The fix was one character: replacing punctuation with an empty string rather than a space, allowing all 13 tests to pass.
+
+<details markdown="1">
+<summary>Conversation with Claude Sonnet 5 (click to expand)</summary>
+
+> **User:** Many tests are failing in the @tests/search-bug/search-bug.spec.ts because the normalisation doesn't seem to be working. Please run the tests then use playwright CLI to heal the tests. Do not use playwright MCP. Report back to me on your results.
+>
+> **Claude (reasoning):** The user wants me to run the search-bug tests and fix any failures using Playwright CLI (no MCP browser tools). Let me start by running the tests to see what's failing.
+>
+> **Claude:** I ran `npx playwright test tests/search-bug/search-bug.spec.ts` and found 7 failures out of 13 tests. All failures follow the same pattern: tests expect "login" (or variations like "LOGIN" and "log-in") to match the title "Issue with log-in", but they don't match in the running app. This suggests a bug in the search normalization logic, not in the tests themselves.
+>
+> **Claude (reasoning):** Before I "heal" the tests by changing their expectations, I should investigate whether this is a real app bug or a test that has wrong expectations. Let me use an Explore agent to find the search normalization code in the app's frontend and understand what's happening.
+>
+> **Claude:** I launched an Explore agent to search the codebase for the search/filter implementation and understand why hyphenated titles aren't matching.
+>
+> **Agent result — Root cause found:** The agent identified the bug in [frontend/src/BoardPage.tsx lines 42-45](frontend/src/BoardPage.tsx#L42-L45):
+>
+> ```js
+> function normalizeForSearch(text: string): string {
+>   const lower = text.toLowerCase().trim();
+>   const noPunctuation = lower.replace(/\p{P}/gu, " ");  // ← BUG HERE
+>   return noPunctuation.replace(/\s+/g, " ").trim();
+> }
+> ```
+>
+> The function replaces punctuation (including hyphens `-`) with **a space** instead of **removing it entirely**. This causes:
+> - `"Issue with log-in"` → normalized to `"issue with log in"` (hyphen becomes a space)
+> - `"login"` query → normalized to `"login"` (no punctuation, unchanged)
+> - String match: `"issue with log in".includes("login")` returns `false` ✗ (because "log in" is two words)
+>
+> The function's own doc comment (line 40) states "Used on both query and bug titles so 'login' matches 'Login fails' and 'Issue with log-in'" — so the tests' expectations are **correct**, and the app code has a **genuine bug**.
+>
+> **Claude (reasoning):** Now I should ask the user: do they want me to fix the app bug in the normalization function, or update the tests to match the broken behavior? The right answer is to fix the app, since the tests are correct and the code is wrong.
+>
+> **Claude:** I reported the findings: this is a genuine app bug in `normalizeForSearch`, not a test problem. The tests correctly expect "login" to match "Issue with log-in", but the code's punctuation replacement strategy prevents it. I asked the user whether to fix the app or heal the tests.
+>
+> **User:** (Chose "Fix the app bug (Recommended)")
+>
+> **Claude (reasoning):** Perfect. The fix is simple: change line 44 from `.replace(/\p{P}/gu, " ")` (space) to `.replace(/\p{P}/gu, "")` (empty string). This will make punctuation disappear entirely instead of becoming spaces, so "log-in" will normalize to "login" and match the query.
+>
+> **Claude:** I edited [frontend/src/BoardPage.tsx line 44](frontend/src/BoardPage.tsx#L44) to strip punctuation entirely:
+>
+> ```js
+> // Before:
+> const noPunctuation = lower.replace(/\p{P}/gu, " ");
+>
+> // After:
+> const noPunctuation = lower.replace(/\p{P}/gu, "");
+> ```
+>
+> Then I re-ran the full test suite: `npx playwright test tests/search-bug/search-bug.spec.ts`
+>
+> **Result:** ✅ **13 passed (9.6s)**
+>
+> All 7 previously failing tests now pass. The fix was correct — stripping punctuation rather than converting it to spaces allows hyphenated compound words to collapse into the form users would type in a plain query.
+
+</details>
