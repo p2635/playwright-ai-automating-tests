@@ -340,3 +340,82 @@ A failing Playwright test (`edit-modal-shows-delete-button.spec.ts`) was fixed b
 > **Claude:** Perfect! The test is now fixed! ✅
 >
 > **User:** Wrap our conversation in a markdown blockquote and save it to a file. Add a two-sentence summary on the top (above the blockquote). If possible, include any reasoning steps that you did in between as well.
+
+</details>
+
+## Update test descriptions to use "should-" convention
+
+All test descriptions across 8 spec files were updated to follow BDD-style naming with the "should-" prefix, making them read more like specifications. This standardizes the test naming convention across the test suite and improves clarity in test reports.
+
+<details markdown="1">
+<summary>Conversation with Claude Haiku 4.5 (click to expand)</summary>
+
+> **User:** I saw in a playwright tutorial that the teacher named the spec files something like 'should-not-(expected result).spec.ts' or 'should-(expected result).spec.ts'. Is that a best practice that I should adopt for my tests?
+>
+> **Claude:** The "should-" prefix is a **common convention**, especially in BDD-style testing, but it's not universally required. Both approaches have merit:
+>
+> **"should-" style** (`should-not-reappear-after-reload.spec.ts`):
+> - Reads more like a spec/requirement
+> - Shorter filenames
+> - Aligns with test descriptions in BDD frameworks
+>
+> **Descriptive style** (`deleted-bug-does-not-reappear-after-reload.spec.ts`):
+> - More context at a glance (easier to find files in large projects)
+> - Works well when you want files to be self-documenting
+> - Less repetitive if your `describe()` blocks already use "should"
+>
+> **What matters most:**
+> 1. **Consistency** — pick one and stick with it across your test suite
+> 2. **Clarity** — the name should make sense to someone unfamiliar with the test
+> 3. **Discoverability** — you should be able to find tests by grep/fuzzy-find
+>
+> Looking at your file structure, you're currently using the descriptive style (`deleted-bug-does-not-reappear-after-reload.spec.ts`). Given your recent commit "refactor: remove numbers from spec file names," it seems you've already established a naming convention. I'd suggest **sticking with your current approach** unless there's a strong team preference otherwise.
+>
+> The real win is making sure your **test descriptions inside the file** (`test('should...', ...)` or `describe('should...', ...)`) are clear, since those appear in test reports and output.
+>
+> **User:** Can you help me to update the test descriptions?
+>
+> **Claude (reasoning):** The user is asking me to help update the test descriptions. I should read the file they have open to see what the current test descriptions are, then I can help them improve them. They likely want them to follow the "should-" convention based on our conversation.
+>
+> **Claude:** I found the test file and can see the current test descriptions. They can be improved to follow the "should-" convention more consistently. Here's what I'd suggest improving:
+>
+> **Current:**
+> - `describe`: "Delete bug workflow"
+> - `test`: "deleted bug does not reappear after reload"
+>
+> **Updated (Option 1 — Recommended):**
+> - `describe`: "Delete bug workflow"
+> - `test`: "should not reappear after page reload"
+>
+> My recommendation is **Option 1** — it's clear, follows BDD style naturally, and is consistent with common Playwright/Jest patterns.
+>
+> **User:** Yes, can you do option 1 and also apply the improvements to all other spec files? I will tweak it one by one if it doesn't exactly meet my needs.
+>
+> **Claude (reasoning):** The user wants me to apply Option 1 to all spec files. I need to:
+> 1. Find all spec files in the project
+> 2. Read each one to see the current test descriptions
+> 3. Update test descriptions to use "should" prefix where appropriate
+> 4. Keep describe blocks consistent and clear
+>
+> This is straightforward — I'll find all .spec.ts files, read them, and make the updates in parallel where possible.
+>
+> **Claude:** Done! I've updated all test descriptions across your 8 spec files to follow the "should-" convention. Here's what changed:
+>
+> **Delete bug tests** (5 files):
+> - ✅ `should not reappear after page reload`
+> - ✅ `should not delete the bug when cancel is clicked`
+> - ✅ `should delete a closed bug and close the modal`
+> - ✅ `should delete an open bug and close the modal`
+> - ✅ `should leave other bugs on the board when one is deleted`
+> - ✅ `should show a delete button in the edit modal`
+>
+> **Search bug tests** (13 tests):
+> - ✅ All updated with "should" prefix (e.g., "should show all seeded Open bugs...", "should filter bugs by title text...")
+>
+> **Seed test**:
+> - ✅ Describe: "Seeding: Board setup"
+> - ✅ Test: "should log in as buggy"
+>
+> All describe blocks have been kept consistent and clear. Feel free to adjust any of these if they don't quite match your preference—just let me know which ones you'd like to tweak!
+
+</details>
