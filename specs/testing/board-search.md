@@ -1,10 +1,8 @@
 # BuggyBoard Board Search Test Plan v1
 
-## Application Overview
+## Feature Overview
 
-BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, which defaults to the Open state and displays the bugs in that selected active state. The title bar contains a live search field labeled "Search bugs by title" and a "Clear search" X control. The board exposes an accessible table named "Bugs", Open and Closed state-filter buttons, sortable ID/Severity/Title/Owner column buttons, and the empty-state messages "No bugs matched." and "No bugs.".
-
-This plan covers end-to-end board searching through the UI. Search is title-only, case-insensitive, whitespace-collapsing, and punctuation-normalizing. State filtering is applied with search, and sorting must remain intact while search results are displayed. "All bugs" in this plan means all bugs in the currently selected active state; because the board defaults to Open, the initial all-bugs check means all Open bugs.
+BuggyBoard's board page includes a live search field for filtering bugs by title.
 
 ## Seed / Fixture Guidance
 

@@ -1,8 +1,8 @@
 # BuggyBoard Create Bug End-to-End Test Plan
 
-## Application Overview
+## Feature Overview
 
-BuggyBoard is a web-based bug tracker. An authenticated user reaches the board, opens the Create bug dialog from the title bar, enters title, severity, owner, and description, then saves or dismisses the modal. The create-bug workflow should persist valid data, default owner to the logged-in user, validate required fields, close through Cancel, Close, or Escape, and remain open when the backdrop is clicked.
+BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the board's title bar.
 
 ## Test Scenarios
 
