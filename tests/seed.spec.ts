@@ -7,8 +7,8 @@ if (!user) {
   throw new Error('Test user not found');
 }
 
-test.describe('Test group', () => {
-  test('log in as buggy', { tag: '@seed' }, async ({ page }) => {
+test.describe('Seeding: Board setup', () => {
+  test('should log in as buggy', { tag: '@seed' }, async ({ page }) => {
     await page.goto('/login');
 
     await page.getByLabel('Username').fill(user.username);
