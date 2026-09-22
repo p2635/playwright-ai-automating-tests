@@ -55,7 +55,7 @@ const boardFixtures: BugFixture[] = [
   },
 ];
 
-test.describe("Board search and state-filter workflows", () => {
+test.describe("Board search: UI controls and state-filter combination", () => {
   let bugs: Bug[];
 
   test.beforeEach(async ({ loginPage, request }) => {
@@ -72,116 +72,6 @@ test.describe("Board search and state-filter workflows", () => {
     for (const bug of bugs) {
       await deleteBugIfExists(request, bug.id);
     }
-  });
-
-  test("should show all seeded Open bugs when the board loads with search blank", async ({
-    boardPage,
-  }) => {
-    await expect(boardPage.searchbox).toHaveValue("");
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-    await expect(boardPage.rowByTitle("Search indexing delay")).toBeVisible();
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeVisible();
-    await expect(boardPage.rowByTitle("Login fixed")).toBeHidden();
-    await expect(boardPage.noBugsMatchedMessage).toBeHidden();
-    await expect(boardPage.noBugsMessage).toBeHidden();
-
-    const titles = await boardPage.visibleTitles();
-    expect(titles.sort()).toEqual(
-      [
-        "Login fails",
-        "Issue with log-in",
-        "Search indexing delay",
-        "Payment button disabled",
-      ].sort()
-    );
-  });
-
-  test("should filter bugs by title text for a partial match on 'login'", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.pressSequentially("login");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-    await expect(boardPage.rowByTitle("Search indexing delay")).toBeHidden();
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
-  });
-
-  test("should filter bugs by title text for a partial match on 'fails'", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("fails");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
-  });
-
-  test("should match search case-insensitively for an uppercase query", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("LOGIN");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
-  });
-
-  test("should normalize leading, trailing, and repeated whitespace in the query", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("  login   fails  ");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeHidden();
-  });
-
-  test("should match a plain query against a hyphenated title", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("login");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-  });
-
-  test("should match a hyphenated query form against the same titles as the plain form", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill(" log-in ");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-  });
-
-  test("should restrict search to title text and exclude titles absent from the query", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("login");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeVisible();
-    await expect(boardPage.rowByTitle("Issue with log-in")).toBeVisible();
-    await expect(boardPage.rowByTitle("Search indexing delay")).toBeHidden();
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
-  });
-
-  test("should exclude matches found only in description, owner, or severity rather than the title", async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("high");
-
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
-  });
-
-  test('should show the "No bugs matched." message when the query matches no titles', async ({
-    boardPage,
-  }) => {
-    await boardPage.searchbox.fill("zzzz-no-title-match");
-
-    await expect(boardPage.rowByTitle("Login fails")).toBeHidden();
-    await expect(boardPage.rowByTitle("Payment button disabled")).toBeHidden();
-    await expect(boardPage.noBugsMatchedMessage).toBeVisible();
-    await expect(boardPage.noBugsMessage).toBeHidden();
   });
 
   test("should clear the search with the X control and restore the active-state board", async ({
