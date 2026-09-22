@@ -4,68 +4,13 @@
 
 BuggyBoard's board page includes a live search field for filtering bugs by title.
 
-## Seed / Fixture Guidance
-
-Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`. Each scenario should start from a fresh or reset data state so scenarios remain independent.
-
-Following the `beforeEach`/`afterEach` pattern used by the delete-bug tests, each scenario's `beforeEach` must first clear the board via the `deleteAllBugs` helper (`tests/support/board-fixtures.ts`), then create the fixture set below individually via `createBug`, matching the `BugFixture` shape over the backend REST API. The matching `afterEach` must delete each created bug via `deleteBugIfExists`, so setup and teardown stay symmetric with the delete-bug tests rather than relying on a bulk seed/reset helper. Include at least these records, with unique IDs and descriptions where shown:
-
-- Open: title `Login fails`, description `Authentication timeout`, severity `HIGH`, owner `buggy`.
-- Open: title `Issue with log-in`, description `Login form validation`, severity `MID`, owner `qa-user`.
-- Open: title `Search indexing delay`, description `The login owner cannot find results`, severity `LOW`, owner `qa-user`.
-- Open: title `Payment button disabled`, description `Payment cannot be submitted`, severity `HIGH`, owner `login-owner`.
-- Closed: title `Login fixed`, description `Closed authentication issue`, severity `LOW`, owner `qa-user`.
-- Closed: title `Archive cleanup`, description `Old records`, severity `HIGH`, owner `buggy`.
-
-The exact records may be created using the repository's established fixture strategy, but every scenario must know the expected titles, states, sort order, and IDs it asserts. Keep at least one Open and one Closed bug available for combined-filter checks. The two Open negative controls deliberately place `login` only in a description or owner, and `Payment button disabled` is a HIGH-severity negative control for a `high` query. For a true no-row state, use a query that matches no title while bugs still exist; this must produce `No bugs matched.`. `No bugs.` is reserved for a selected state with no bugs at all and should not be confused with a search miss.
-
-## Locator Guidance
-
-Prefer accessible Playwright locators: `getByRole('searchbox', { name: 'Search bugs by title' })`, `getByRole('button', { name: 'Clear search' })`, `getByRole('button', { name: 'Open' })`, `getByRole('button', { name: 'Closed' })`, `getByRole('table', { name: 'Bugs' })`, table rows, and column-header buttons named `ID`, `Severity`, `Title`, and `Owner`. Scope title and owner assertions to the `Bugs` table. Use row or cell text for bug identity, and use `aria-sort` on the relevant column header to verify the sort indicator rather than relying only on decorative arrow text.
-
-## Verification Commands
-
-- `npm test`
-- `npx playwright test --grep-invert @seed`
-- `npm run lint`
-
-The plan is documentation only. It does not create automated test files.
-
-## Spec Traceability Legend
-
-Each `expect` below cites one or more codes from this legend in square brackets, e.g. `[11-AC2]`. `[plan-only]` marks an expectation that documents a test-plan decision (fixture design, message-text distinctions) with no directly corresponding acceptance criterion.
-
-| Code | File | Acceptance Criteria / Section |
-| ------ | ------ | -------------------------------- |
-| 07-AC1 | `specs/features/07-bug-board.md` | Board page displays a bugs table with the correct columns |
-| 07-AC2 | `specs/features/07-bug-board.md` | Board page shows all bugs from the database |
-| 07-AC3 | `specs/features/07-bug-board.md` | Board page shows an empty table when there are no bugs |
-| 10-AC2 | `specs/features/10-sort-board-columns.md` | User can sort by a column by clicking its header |
-| 10-AC4 | `specs/features/10-sort-board-columns.md` | Only one column is the active sort at a time |
-| 11-AC1 | `specs/features/11-search-board.md` | Board shows all bugs when search field is blank |
-| 11-AC2 | `specs/features/11-search-board.md` | Typing in the search field filters bugs by title |
-| 11-AC3 | `specs/features/11-search-board.md` | Search matching is case insensitive and normalizes whitespace and punctuation |
-| 11-AC4 | `specs/features/11-search-board.md` | Clearing the search with the X control resets the board |
-| 11-AC5 | `specs/features/11-search-board.md` | Sorting is preserved when searching |
-| 11-AC6 | `specs/features/11-search-board.md` | No results message when search matches no bugs |
-| 11-OOS | `specs/features/11-search-board.md` | Out of Scope: search by description, owner, and severity are excluded |
-| 13-AC3 | `specs/features/13-bug-status.md` | Board state filter defaults to Open |
-| 13-AC4 | `specs/features/13-bug-status.md` | Selecting Closed in the state filter shows only closed bugs |
-| 13-AC5 | `specs/features/13-bug-status.md` | Sorting works when a state filter is applied |
-| 13-AC6 | `specs/features/13-bug-status.md` | Search and state filter apply together |
-| 13-AC7 | `specs/features/13-bug-status.md` | No bugs matched message when selected state has no bugs |
-
 ## Test Scenarios
 
 ### 1. Board search and state-filter workflows
 
-**Seed:** `tests/seed.spec.ts`
-
 #### 1.1. Shows all visible bugs in the default active state when search is blank
 
-Log in and create the necessary test data for board.md test to be carried out. For more information, see the section "Seed / Fixture Guidance". Then confirm the board defaults to Open and lists every seeded Open bug with no search applied.
-
-**File:** `tests/board/board-search.spec.ts`
+Log in and create the necessary test data for board.md test to be carried out. Then confirm the board defaults to Open and lists every seeded Open bug with no search applied.
 
 **Steps:**
 
@@ -84,8 +29,6 @@ Log in and create the necessary test data for board.md test to be carried out. F
 
 Type a partial title into the search box and verify the board filters live to matching titles only, then refine the query further and confirm results narrow accordingly.
 
-**File:** `tests/board/board-search.spec.ts`
-
 **Steps:**
 
 1. Focus the `Search bugs by title` searchbox and type `login` one character at a time.
@@ -100,8 +43,6 @@ Type a partial title into the search box and verify the board filters live to ma
 #### 1.3. Matches case-insensitively and normalizes whitespace
 
 Enter a query in mixed case and with extra whitespace to confirm search matching ignores case and collapses whitespace when comparing against titles.
-
-**File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
 
@@ -118,8 +59,6 @@ Enter a query in mixed case and with extra whitespace to confirm search matching
 
 Enter queries with and without punctuation to confirm the search normalizes punctuation so that hyphenated and plain forms of the same term match the same titles.
 
-**File:** `tests/board/board-search.spec.ts`
-
 **Steps:**
 
 1. Enter `login` in the `Search bugs by title` searchbox with Open selected.
@@ -134,8 +73,6 @@ Enter queries with and without punctuation to confirm the search normalizes punc
 #### 1.5. Restrict search to title text only, excluding matches in description, owner, or severity
 
 Search for terms that only appear in a bug's description, owner, or severity fields and confirm those bugs are excluded because search is title-only.
-
-**File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
 
@@ -156,8 +93,6 @@ Search for terms that only appear in a bug's description, owner, or severity fie
 
 Enter a query that matches no titles while bugs still exist and confirm the board shows the `No bugs matched.` empty-state message rather than any bug rows.
 
-**File:** `tests/board/board-search.spec.ts`
-
 **Steps:**
 
 1. With bugs present in the selected Open state, enter a unique query such as `zzzz-no-title-match` in the `Search bugs by title` searchbox.
@@ -169,8 +104,6 @@ Enter a query that matches no titles while bugs still exist and confirm the boar
 #### 1.7. Clears search with the X control and restores the active-state board
 
 Enter a search query, then click the `Clear search` control and confirm the searchbox empties and the full set of bugs for the active state is restored.
-
-**File:** `tests/board/board-search.spec.ts`
 
 **Steps:**
 
@@ -186,9 +119,7 @@ Enter a search query, then click the `Clear search` control and confirm the sear
 
 #### 1.8. Preserves sort order and sort indicator while searching
 
-Sort the table by a column, then apply and change search queries, and confirm the sort order and `aria-sort` indicator remain intact throughout.
-
-**File:** `tests/board/board-search.spec.ts`
+Sort the table by a column, then apply and change search queries, and confirm the sort order and sort indicator remain intact throughout.
 
 **Steps:**
 
@@ -209,8 +140,6 @@ Sort the table by a column, then apply and change search queries, and confirm th
 
 Switch between the Open and Closed state filters while a search query is active and confirm results always reflect the intersection of the selected state and the title query.
 
-**File:** `tests/board/board-search.spec.ts`
-
 **Steps:**
 
 1. With the searchbox blank, click the `Closed` state button.
@@ -230,3 +159,60 @@ Switch between the Open and Closed state filters while a search query is active 
    - expect: When the query has no match in the selected state, `No bugs matched.` is shown and there are no bug rows. [13-AC7]
    - expect: Changing the state reevaluates the same query against the newly selected state. [13-AC6]
    - expect: A state that has no matching title still shows `No bugs matched.` rather than rows from the other state. [13-AC7]
+
+## Technical Information
+
+### Test File Location
+
+All test scenarios in section 1 are implemented in `tests/board/board-search.spec.ts`.
+
+### Seed / Fixture Guidance
+
+Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`. Each scenario should start from a fresh or reset data state so scenarios remain independent.
+
+Following the `beforeEach`/`afterEach` pattern used by the delete-bug tests, each scenario's `beforeEach` must first clear the board via the `deleteAllBugs` helper (`tests/support/board-fixtures.ts`), then create the fixture set below individually via `createBug`, matching the `BugFixture` shape over the backend REST API. The matching `afterEach` must delete each created bug via `deleteBugIfExists`, so setup and teardown stay symmetric with the delete-bug tests rather than relying on a bulk seed/reset helper. Include at least these records, with unique IDs and descriptions where shown:
+
+- Open: title `Login fails`, description `Authentication timeout`, severity `HIGH`, owner `buggy`.
+- Open: title `Issue with log-in`, description `Login form validation`, severity `MID`, owner `qa-user`.
+- Open: title `Search indexing delay`, description `The login owner cannot find results`, severity `LOW`, owner `qa-user`.
+- Open: title `Payment button disabled`, description `Payment cannot be submitted`, severity `HIGH`, owner `login-owner`.
+- Closed: title `Login fixed`, description `Closed authentication issue`, severity `LOW`, owner `qa-user`.
+- Closed: title `Archive cleanup`, description `Old records`, severity `HIGH`, owner `buggy`.
+
+The exact records may be created using the repository's established fixture strategy, but every scenario must know the expected titles, states, sort order, and IDs it asserts. Keep at least one Open and one Closed bug available for combined-filter checks. The two Open negative controls deliberately place `login` only in a description or owner, and `Payment button disabled` is a HIGH-severity negative control for a `high` query. For a true no-row state, use a query that matches no title while bugs still exist; this must produce `No bugs matched.`. `No bugs.` is reserved for a selected state with no bugs at all and should not be confused with a search miss.
+
+### Locator Guidance
+
+Prefer accessible Playwright locators: `getByRole('searchbox', { name: 'Search bugs by title' })`, `getByRole('button', { name: 'Clear search' })`, `getByRole('button', { name: 'Open' })`, `getByRole('button', { name: 'Closed' })`, `getByRole('table', { name: 'Bugs' })`, table rows, and column-header buttons named `ID`, `Severity`, `Title`, and `Owner`. Scope title and owner assertions to the `Bugs` table. Use row or cell text for bug identity, and use `aria-sort` on the relevant column header to verify the sort indicator rather than relying only on decorative arrow text.
+
+### Verification Commands
+
+- `npm test`
+- `npx playwright test --grep-invert @seed`
+- `npm run lint`
+
+The plan is documentation only. It does not create automated test files.
+
+### Spec Traceability Legend
+
+Each `expect` in the test scenarios cites one or more codes from this legend in square brackets, e.g. `[11-AC2]`. `[plan-only]` marks an expectation that documents a test-plan decision (fixture design, message-text distinctions) with no directly corresponding acceptance criterion.
+
+| Code | File | Acceptance Criteria / Section |
+| ------ | ------ | -------------------------------- |
+| 07-AC1 | `specs/features/07-bug-board.md` | Board page displays a bugs table with the correct columns |
+| 07-AC2 | `specs/features/07-bug-board.md` | Board page shows all bugs from the database |
+| 07-AC3 | `specs/features/07-bug-board.md` | Board page shows an empty table when there are no bugs |
+| 10-AC2 | `specs/features/10-sort-board-columns.md` | User can sort by a column by clicking its header |
+| 10-AC4 | `specs/features/10-sort-board-columns.md` | Only one column is the active sort at a time |
+| 11-AC1 | `specs/features/11-search-board.md` | Board shows all bugs when search field is blank |
+| 11-AC2 | `specs/features/11-search-board.md` | Typing in the search field filters bugs by title |
+| 11-AC3 | `specs/features/11-search-board.md` | Search matching is case insensitive and normalizes whitespace and punctuation |
+| 11-AC4 | `specs/features/11-search-board.md` | Clearing the search with the X control resets the board |
+| 11-AC5 | `specs/features/11-search-board.md` | Sorting is preserved when searching |
+| 11-AC6 | `specs/features/11-search-board.md` | No results message when search matches no bugs |
+| 11-OOS | `specs/features/11-search-board.md` | Out of Scope: search by description, owner, and severity are excluded |
+| 13-AC3 | `specs/features/13-bug-status.md` | Board state filter defaults to Open |
+| 13-AC4 | `specs/features/13-bug-status.md` | Selecting Closed in the state filter shows only closed bugs |
+| 13-AC5 | `specs/features/13-bug-status.md` | Sorting works when a state filter is applied |
+| 13-AC6 | `specs/features/13-bug-status.md` | Search and state filter apply together |
+| 13-AC7 | `specs/features/13-bug-status.md` | No bugs matched message when selected state has no bugs |

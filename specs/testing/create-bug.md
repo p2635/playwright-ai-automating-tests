@@ -8,11 +8,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
 
 ### 1. Create bug workflow
 
-**Seed:** `tests/seed.spec.ts`
-
-#### 1.1. opens the create-bug modal with required controls
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.1. Opens the create-bug modal with required controls
 
 **Steps:**
 
@@ -22,9 +18,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog contains Cancel and Save buttons.
     - expect: The Severity control offers HIGH, MID, and LOW options.
 
-#### 1.2. defaults owner to the authenticated user
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.2. Defaults owner to the authenticated user
 
 **Steps:**
 
@@ -33,9 +27,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The Title field is focused and empty.
     - expect: The Severity field defaults to MID.
 
-#### 1.3. saves a valid bug and closes the modal
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.3. Saves a valid bug and closes the modal
 
 **Steps:**
 
@@ -47,9 +39,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog is closed.
     - expect: A board row shows the unique title, HIGH severity, and buggy owner.
 
-#### 1.4. cancels without saving
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.4. Cancels without saving
 
 **Steps:**
 
@@ -59,9 +49,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog is closed.
     - expect: No board row shows the unique title.
 
-#### 1.5. closes with the X button without saving
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.5. Closes with the X button without saving
 
 **Steps:**
 
@@ -71,9 +59,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog is closed.
     - expect: No board row shows the unique title.
 
-#### 1.6. closes with Escape without saving
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.6. Closes with Escape without saving
 
 **Steps:**
 
@@ -83,9 +69,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog is closed.
     - expect: No board row shows the unique title.
 
-#### 1.7. keeps entered data when the backdrop is clicked
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.7. Keeps entered data when the backdrop is clicked
 
 **Steps:**
 
@@ -95,9 +79,7 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog remains open.
     - expect: The title and description values are preserved.
 
-#### 1.8. blocks save when required fields are blank
-
-**File:** `tests/create-bug/create-bug.spec.ts`
+#### 1.8. Blocks save when required fields are blank
 
 **Steps:**
 
@@ -107,3 +89,13 @@ BuggyBoard's Create bug dialog lets an authenticated user add a new bug from the
     - expect: The dialog remains open.
     - expect: An alert lists required-field validation messages.
     - expect: No new bug is added to the board.
+
+## Technical Information
+
+### Test File Location
+
+All test scenarios in section 1 are implemented in `tests/create-bug/create-bug.spec.ts`.
+
+### Seed / Setup
+
+All test scenarios use `tests/seed.spec.ts` as the authentication and navigation seed. It authenticates as the `buggy` user and verifies navigation to `/board`.

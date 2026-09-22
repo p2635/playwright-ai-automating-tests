@@ -8,38 +8,11 @@
 
 BuggyBoard's bug Edit modal includes a Delete button for removing a bug.
 
-## Seed / Fixture Guidance
-
-Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`.
-
-Each scenario must create the bug(s) it deletes as part of its own setup, via the backend REST API (`POST http://localhost:3000/api/bugs`, matching the `BugFixture` shape and the `createBug`/`deleteBugIfExists` helpers in `tests/support/board-fixtures.ts`), so every test starts from a known, isolated bug rather than relying on pre-existing board data. Do not delete or reset unrelated bugs already on the board.
-
-Give every created bug a descriptive, unique title that identifies the scenario and run, e.g. `Delete bug test scenario 1.2 <ISO timestamp>`, so a human reviewing a test report or the database can trace a leftover or failed-deletion row back to the exact scenario that created it.
-
-## Locator Guidance
-
-Prefer accessible Playwright locators: `getByRole('button', { name: 'Open' })` / `getByRole('button', { name: 'Closed' })` for the state filter, `getByRole('table', { name: 'Bugs' })` and row text for board identity, `getByRole('dialog', { name: /Edit bug/ })` for the modal, and `getByRole('button', { name: 'Delete' })` / `'Cancel'` / `'Save'` within it. Use `GET http://localhost:3000/api/bugs` to verify server-side state (existence, absence, and count) independent of the UI.
-
-## Spec Traceability Legend
-
-Each `expect` below cites one or more codes from this legend in square brackets, e.g. `[12-AC2]`. `[plan-only]` marks an expectation that documents a test-plan decision (fixture/data-tracing design) with no directly corresponding acceptance criterion.
-
-| Code | File | Acceptance Criteria / Section |
-| ------ | ------ | -------------------------------- |
-| 12-AC1 | `specs/features/12-delete-bug.md` | Edit bug modal displays a delete button |
-| 12-AC2 | `specs/features/12-delete-bug.md` | Deleting a bug removes it from the database and closes the modal |
-| 09-AC6 | `specs/features/09-edit-bug.md` | User can cancel without saving changes |
-| 13-AC4 | `specs/features/13-bug-status.md` | Selecting Closed in the state filter shows only closed bugs |
-
 ## Test Scenarios
 
 ### 1. Delete bug workflow
 
-**Seed:** `tests/seed.spec.ts`
-
-#### 1.1. edit modal shows a delete button
-
-**File:** To be created
+#### 1.1. Edit modal shows a delete button
 
 **Preconditions:**
 
@@ -55,9 +28,7 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 2. The dialog shows a "Delete" button. [12-AC1]
 3. The dialog also shows "Cancel" and "Save" buttons. [12-AC1]
 
-#### 1.2. deletes an open bug and closes the modal
-
-**File:** To be created
+#### 1.2. Deletes an open bug and closes the modal
 
 **Preconditions:**
 
@@ -76,9 +47,7 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 3. The "Open" state filter is still selected. [13-AC4]
 4. A `GET /api/bugs` request no longer includes the deleted bug's ID, and the bug count is back to the recorded count. [12-AC2, plan-only]
 
-#### 1.3. deletes a closed bug and closes the modal
-
-**File:** To be created
+#### 1.3. Deletes a closed bug and closes the modal
 
 **Preconditions:**
 
@@ -97,9 +66,7 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 3. The "Closed" state filter is still selected. [13-AC4]
 4. A `GET /api/bugs` request no longer includes the deleted bug's ID, and the Closed bug count is back to the recorded count. [12-AC2, plan-only]
 
-#### 1.4. deleted bug does not reappear after reload
-
-**File:** To be created
+#### 1.4. Deleted bug does not reappear after reload
 
 **Preconditions:**
 
@@ -116,9 +83,7 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 1. The dialog is closed and the bug is removed from the board. [12-AC2]
 2. No board row shows the deleted bug's title after reload. [12-AC2]
 
-#### 1.5. cancel does not delete the bug
-
-**File:** To be created
+#### 1.5. Cancel does not delete the bug
 
 **Preconditions:**
 
@@ -136,9 +101,7 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 2. The board still shows a row with the bug's title. [09-AC6]
 3. The bug count returned by `GET /api/bugs` is unchanged from the count recorded after creation (i.e. the bug was not removed). [09-AC6, plan-only]
 
-#### 1.6. deleting one bug leaves other bugs on the board
-
-**File:** To be created
+#### 1.6. Deleting one bug leaves other bugs on the board
 
 **Preconditions:**
 
@@ -161,3 +124,28 @@ Each `expect` below cites one or more codes from this legend in square brackets,
 
 - Verifying that a deleted bug's title can no longer be found via the board search field. To be addressed in a future revision of this plan.
 - This test plan is the latest format and should be applied to other test plans for consistency e.g. markdown lists, header info (version, date generated and reviewed)
+
+## Technical Information
+
+### Seed / Fixture Guidance
+
+Use `tests/seed.spec.ts` as the Playwright seed for every workflow. It authenticates as the `buggy` user and verifies navigation to `/board`.
+
+Each scenario must create the bug(s) it deletes as part of its own setup, via the backend REST API (`POST http://localhost:3000/api/bugs`, matching the `BugFixture` shape and the `createBug`/`deleteBugIfExists` helpers in `tests/support/board-fixtures.ts`), so every test starts from a known, isolated bug rather than relying on pre-existing board data. Do not delete or reset unrelated bugs already on the board.
+
+Give every created bug a descriptive, unique title that identifies the scenario and run, e.g. `Delete bug test scenario 1.2 <ISO timestamp>`, so a human reviewing a test report or the database can trace a leftover or failed-deletion row back to the exact scenario that created it.
+
+### Locator Guidance
+
+Prefer accessible Playwright locators: `getByRole('button', { name: 'Open' })` / `getByRole('button', { name: 'Closed' })` for the state filter, `getByRole('table', { name: 'Bugs' })` and row text for board identity, `getByRole('dialog', { name: /Edit bug/ })` for the modal, and `getByRole('button', { name: 'Delete' })` / `'Cancel'` / `'Save'` within it. Use `GET http://localhost:3000/api/bugs` to verify server-side state (existence, absence, and count) independent of the UI.
+
+### Spec Traceability Legend
+
+Each `expect` in the test scenarios cites one or more codes from this legend in square brackets, e.g. `[12-AC2]`. `[plan-only]` marks an expectation that documents a test-plan decision (fixture/data-tracing design) with no directly corresponding acceptance criterion.
+
+| Code | File | Acceptance Criteria / Section |
+| ------ | ------ | -------------------------------- |
+| 12-AC1 | `specs/features/12-delete-bug.md` | Edit bug modal displays a delete button |
+| 12-AC2 | `specs/features/12-delete-bug.md` | Deleting a bug removes it from the database and closes the modal |
+| 09-AC6 | `specs/features/09-edit-bug.md` | User can cancel without saving changes |
+| 13-AC4 | `specs/features/13-bug-status.md` | Selecting Closed in the state filter shows only closed bugs |
