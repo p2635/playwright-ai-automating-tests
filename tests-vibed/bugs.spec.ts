@@ -1,4 +1,4 @@
-import { test, expect } from "../tests/pages/fixtures.js";
+import { test, expect } from "../tests/fixtures/pages.js";
 import users from "../users.json" with { type: "json" };
 
 const user = users.find(({ username }) => username === "buggy");
@@ -7,7 +7,12 @@ if (!user) {
   throw new Error("Test user not found");
 }
 
-test("creates a new bug", async ({ page, loginPage, boardPage, createBugDialog }) => {
+test("creates a new bug", async ({
+  page,
+  loginPage,
+  boardPage,
+  createBugDialog,
+}) => {
   const bugTitle = `Playwright bug ${Date.now()}`;
 
   await loginPage.login(user);

@@ -1,4 +1,4 @@
-import { test, expect } from "../pages/fixtures.js";
+import { test, expect } from "../fixtures/pages.js";
 import { getUser } from "../support/auth.js";
 import {
   createBug,
@@ -208,7 +208,10 @@ test.describe("Board search and state-filter workflows", () => {
   }) => {
     await boardPage.titleSortButton.click();
 
-    await expect(boardPage.titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
+    await expect(boardPage.titleColumnHeader).toHaveAttribute(
+      "aria-sort",
+      "ascending"
+    );
     expect(await boardPage.visibleTitles()).toEqual([
       "Issue with log-in",
       "Login fails",
@@ -218,8 +221,14 @@ test.describe("Board search and state-filter workflows", () => {
 
     await boardPage.searchbox.fill("login");
 
-    await expect(boardPage.titleColumnHeader).toHaveAttribute("aria-sort", "ascending");
-    expect(await boardPage.visibleTitles()).toEqual(["Issue with log-in", "Login fails"]);
+    await expect(boardPage.titleColumnHeader).toHaveAttribute(
+      "aria-sort",
+      "ascending"
+    );
+    expect(await boardPage.visibleTitles()).toEqual([
+      "Issue with log-in",
+      "Login fails",
+    ]);
 
     await boardPage.severitySortButton.click();
     await boardPage.searchbox.fill("log");

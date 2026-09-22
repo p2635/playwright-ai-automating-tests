@@ -1,8 +1,8 @@
 import { test as base } from "@playwright/test";
-import { LoginPage } from "./login.page.js";
-import { BoardPage } from "./board.page.js";
-import { EditBugDialogPage } from "./edit-bug-dialog.page.js";
-import { CreateBugDialogPage } from "./create-bug-dialog.page.js";
+import { LoginPage } from "../pages/login.page.js";
+import { BoardPage } from "../pages/board.page.js";
+import { EditBugDialogPage } from "../pages/edit-bug-dialog.page.js";
+import { CreateBugDialogPage } from "../pages/create-bug-dialog.page.js";
 
 type Pages = {
   loginPage: LoginPage;

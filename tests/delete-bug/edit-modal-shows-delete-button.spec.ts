@@ -1,8 +1,12 @@
 // spec: specs/testing/delete-bug.md
 // seed: tests/seed.spec.ts
-import { test, expect } from "../pages/fixtures.js";
+import { test, expect } from "../fixtures/pages.js";
 import { getUser } from "../support/auth.js";
-import { createBug, deleteBugIfExists, type Bug } from "../support/board-fixtures.js";
+import {
+  createBug,
+  deleteBugIfExists,
+  type Bug,
+} from "../support/board-fixtures.js";
 
 const user = getUser("buggy");
 
@@ -25,7 +29,10 @@ test.describe("Delete bug workflow", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("edit modal shows a delete button", async ({ boardPage, editBugDialog }) => {
+  test("edit modal shows a delete button", async ({
+    boardPage,
+    editBugDialog,
+  }) => {
     // Act: open the Edit modal for the newly created bug.
     await boardPage.openBugByTitle(bug.title);
 
