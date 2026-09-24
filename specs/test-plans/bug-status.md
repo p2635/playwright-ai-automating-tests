@@ -29,22 +29,7 @@ BuggyBoard tracks a bug's state (Open or Closed). New bugs are created Open; the
 
 ### 2. Changing state via the edit-bug modal
 
-#### 2.1. Edit modal displays and allows changing state
-
-**Preconditions:**
-
-1. Authenticate as `buggy` and open the board.
-2. An Open bug exists with a known unique title.
-
-**Steps:**
-
-1. Open the edit-bug modal for the bug.
-
-**Expected Results:**
-
-1. The State field shows "Open". [13-AC2]
-
-#### 2.2. Changing state to Closed and saving updates the database and board
+#### 2.1. Changing state to Closed and saving updates the database and board
 
 **Preconditions:**
 
@@ -60,9 +45,10 @@ BuggyBoard tracks a bug's state (Open or Closed). New bugs are created Open; the
 
 **Expected Results:**
 
-1. The Save button becomes enabled once the state changes. [13-AC2]
-2. After saving, the bug no longer appears in the board table while the Open filter is selected. [13-AC2]
-3. Selecting the Closed filter shows the bug. [13-AC2]
+1. The State field shows "Open" before it is changed. [13-AC2]
+2. The Save button becomes enabled once the state changes. [13-AC2]
+3. After saving, the bug no longer appears in the board table while the Open filter is selected. [13-AC2]
+4. Selecting the Closed filter shows the bug. [13-AC2]
 
 ### 3. Board state filter defaults and toggling
 
@@ -79,7 +65,7 @@ BuggyBoard tracks a bug's state (Open or Closed). New bugs are created Open; the
 
 **Expected Results:**
 
-1. The Open filter button is visually selected (active styling). [13-AC3]
+1. The Open filter button is visually selected (active styling — see Testability note on asserting this). [13-AC3]
 2. The board table shows the open bug's title. [13-AC3]
 3. The board table does not show the closed bug's title. [13-AC3]
 
@@ -169,6 +155,10 @@ Use `tests/seed.spec.ts` as the Playwright seed. Create bugs via `tests/support/
 ### Locator Guidance
 
 Reuse `tests/pages/board.page.ts`: `openFilterButton` (`getByRole('button', { name: 'Open' })`), `closedFilterButton` (`getByRole('button', { name: 'Closed' })`), `noBugsMatchedMessage`, `rowByTitle`. For the edit modal's State field, use `dialog.getByLabel('State')` with `selectOption('closed')` / `selectOption('open')`, alongside `tests/pages/edit-bug-dialog.page.ts`'s `saveButton`.
+
+### Testability
+
+- The Open/Closed filter buttons expose no accessible selected-state attribute (no `aria-pressed`/`aria-checked`/`role="radiogroup"`) — the active button is only distinguished by a CSS class (`bg-primary`). Scenario 3.1's "visually selected" assertion will need to check for that class directly (e.g. `toHaveClass(/bg-primary/)`) until this is resolved. See the open product question in `specs/product/product-questions.md` ("Bug state filter: no accessible 'selected' indicator") — if that's resolved in favor of adding `aria-pressed`, update this scenario to assert on the attribute instead of the CSS class.
 
 ### Spec Traceability Legend
 
