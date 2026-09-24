@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Claude Code Insights</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; color: #334155; line-height: 1.65; padding: 48px 24px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    h2 { font-size: 20px; font-weight: 600; color: #0f172a; margin-top: 48px; margin-bottom: 16px; }
+    .subtitle { color: #64748b; font-size: 15px; margin-bottom: 32px; }
+    .nav-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 32px 0; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .nav-toc a { font-size: 12px; color: #64748b; text-decoration: none; padding: 6px 12px; border-radius: 6px; background: #f1f5f9; transition: all 0.15s; }
+    .nav-toc a:hover { background: #e2e8f0; color: #334155; }
+    .stats-row { display: flex; gap: 24px; margin-bottom: 40px; padding: 20px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; }
+    .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .at-a-glance { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; }
+    .glance-title { font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 16px; }
+    .glance-sections { display: flex; flex-direction: column; gap: 12px; }
+    .glance-section { font-size: 14px; color: #78350f; line-height: 1.6; }
+    .glance-section strong { color: #92400e; }
+    .see-more { color: #b45309; text-decoration: none; font-size: 13px; white-space: nowrap; }
+    .see-more:hover { text-decoration: underline; }
+    .project-areas { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .project-area { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+    .area-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .area-name { font-weight: 600; font-size: 15px; color: #0f172a; }
+    .area-count { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+    .area-desc { font-size: 14px; color: #475569; line-height: 1.5; }
+    .narrative { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+    .narrative p { margin-bottom: 12px; font-size: 14px; color: #475569; line-height: 1.7; }
+    .key-insight { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 14px; color: #166534; }
+    .section-intro { font-size: 14px; color: #64748b; margin-bottom: 16px; }
+    .big-wins { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .big-win { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; }
+    .big-win-title { font-weight: 600; font-size: 15px; color: #166534; margin-bottom: 8px; }
+    .big-win-desc { font-size: 14px; color: #15803d; line-height: 1.5; }
+    .friction-categories { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    .friction-category { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 16px; }
+    .friction-title { font-weight: 600; font-size: 15px; color: #991b1b; margin-bottom: 6px; }
+    .friction-desc { font-size: 13px; color: #7f1d1d; margin-bottom: 10px; }
+    .friction-examples { margin: 0 0 0 20px; font-size: 13px; color: #334155; }
+    .friction-examples li { margin-bottom: 4px; }
+    .claude-md-section { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .claude-md-section h3 { font-size: 14px; font-weight: 600; color: #1e40af; margin: 0 0 12px 0; }
+    .claude-md-actions { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #dbeafe; }
+    .copy-all-btn { background: #2563eb; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .copy-all-btn:hover { background: #1d4ed8; }
+    .copy-all-btn.copied { background: #16a34a; }
+    .claude-md-item { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid #dbeafe; }
+    .claude-md-item:last-child { border-bottom: none; }
+    .cmd-checkbox { margin-top: 2px; }
+    .cmd-code { background: white; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #1e40af; border: 1px solid #bfdbfe; font-family: monospace; display: block; white-space: pre-wrap; word-break: break-word; flex: 1; }
+    .cmd-why { font-size: 12px; color: #64748b; width: 100%; padding-left: 24px; margin-top: 4px; }
+    .features-section, .patterns-section { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+    .feature-card { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 16px; }
+    .pattern-card { background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 16px; }
+    .feature-title, .pattern-title { font-weight: 600; font-size: 15px; color: #0f172a; margin-bottom: 6px; }
+    .feature-oneliner { font-size: 14px; color: #475569; margin-bottom: 8px; }
+    .pattern-summary { font-size: 14px; color: #475569; margin-bottom: 8px; }
+    .feature-why, .pattern-detail { font-size: 13px; color: #334155; line-height: 1.5; }
+    .feature-examples { margin-top: 12px; }
+    .feature-example { padding: 8px 0; border-top: 1px solid #d1fae5; }
+    .feature-example:first-child { border-top: none; }
+    .example-desc { font-size: 13px; color: #334155; margin-bottom: 6px; }
+    .example-code-row { display: flex; align-items: flex-start; gap: 8px; }
+    .example-code { flex: 1; background: #f1f5f9; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #334155; overflow-x: auto; white-space: pre-wrap; }
+    .copyable-prompt-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+    .copyable-prompt-row { display: flex; align-items: flex-start; gap: 8px; }
+    .copyable-prompt { flex: 1; background: #f8fafc; padding: 10px 12px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #334155; border: 1px solid #e2e8f0; white-space: pre-wrap; line-height: 1.5; }
+    .feature-code { background: #f8fafc; padding: 12px; border-radius: 6px; margin-top: 12px; border: 1px solid #e2e8f0; display: flex; align-items: flex-start; gap: 8px; }
+    .feature-code code { flex: 1; font-family: monospace; font-size: 12px; color: #334155; white-space: pre-wrap; }
+    .pattern-prompt { background: #f8fafc; padding: 12px; border-radius: 6px; margin-top: 12px; border: 1px solid #e2e8f0; }
+    .pattern-prompt code { font-family: monospace; font-size: 12px; color: #334155; display: block; white-space: pre-wrap; margin-bottom: 8px; }
+    .prompt-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .copy-btn { background: #e2e8f0; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; color: #475569; flex-shrink: 0; }
+    .copy-btn:hover { background: #cbd5e1; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
+    .chart-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+    .chart-title { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 12px; }
+    .bar-row { display: flex; align-items: center; margin-bottom: 6px; }
+    .bar-label { width: 100px; font-size: 11px; color: #475569; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { flex: 1; height: 6px; background: #f1f5f9; border-radius: 3px; margin: 0 8px; }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .bar-value { width: 28px; font-size: 11px; font-weight: 500; color: #64748b; text-align: right; }
+    .empty { color: #94a3b8; font-size: 13px; }
+    .horizon-section { display: flex; flex-direction: column; gap: 16px; }
+    .horizon-card { background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%); border: 1px solid #c4b5fd; border-radius: 8px; padding: 16px; }
+    .horizon-title { font-weight: 600; font-size: 15px; color: #5b21b6; margin-bottom: 8px; }
+    .horizon-possible { font-size: 14px; color: #334155; margin-bottom: 10px; line-height: 1.5; }
+    .horizon-tip { font-size: 13px; color: #6b21a8; background: rgba(255,255,255,0.6); padding: 8px 12px; border-radius: 4px; }
+    .feedback-header { margin-top: 48px; color: #64748b; font-size: 16px; }
+    .feedback-intro { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+    .feedback-section { margin-top: 16px; }
+    .feedback-section h3 { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 12px; }
+    .feedback-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .feedback-card.team-card { background: #eff6ff; border-color: #bfdbfe; }
+    .feedback-card.model-card { background: #faf5ff; border-color: #e9d5ff; }
+    .feedback-title { font-weight: 600; font-size: 14px; color: #0f172a; margin-bottom: 6px; }
+    .feedback-detail { font-size: 13px; color: #475569; line-height: 1.5; }
+    .feedback-evidence { font-size: 12px; color: #64748b; margin-top: 8px; }
+    .fun-ending { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #fbbf24; border-radius: 12px; padding: 24px; margin-top: 40px; text-align: center; }
+    .fun-headline { font-size: 18px; font-weight: 600; color: #78350f; margin-bottom: 8px; }
+    .fun-detail { font-size: 14px; color: #92400e; }
+    .collapsible-section { margin-top: 16px; }
+    .collapsible-header { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+    .collapsible-header h3 { margin: 0; font-size: 14px; font-weight: 600; color: #475569; }
+    .collapsible-arrow { font-size: 12px; color: #94a3b8; transition: transform 0.2s; }
+    .collapsible-content { display: none; padding-top: 16px; }
+    .collapsible-content.open { display: block; }
+    .collapsible-header.open .collapsible-arrow { transform: rotate(90deg); }
+    @media (max-width: 640px) { .charts-row { grid-template-columns: 1fr; } .stats-row { justify-content: center; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Claude Code Insights</h1>
+    <p class="subtitle">224 messages across 44 sessions (60 total) | 2026-09-02 to 2026-09-22</p>
+
+    
+    <div class="at-a-glance">
+      <div class="glance-title">At a Glance</div>
+      <div class="glance-sections">
+        <div class="glance-section"><strong>What's working:</strong> You work plan-first: you explore the app live, write a test plan, turn it into a reusable template, and then generate atomic specs that trace back to documented scenarios. You also expect proof on bigger refactors like the POM-with-fixtures migration, and you compare failures against the original file so real regressions stand out from existing app bugs. You push back when Claude&apos;s defaults don&apos;t fit, such as its tone or where raw logs should live, and that is turning your learning into a credible testing portfolio. <a href="#section-wins" class="see-more">Impressive Things You Did →</a></div>
+        <div class="glance-section"><strong>What's hindering you:</strong> On Claude&apos;s side, it often failed to find or use the agents, skills and MCP tools you had set up. It defaulted to MCP when you asked for the CLI, missed your .github/agents files, and gave shaky explanations of how agents register. Chat exports also needed rework because of missing &apos;&gt;&apos; prefixes, paraphrased narration and files saved where you couldn&apos;t see them. On your side, much of that friction comes from tooling that lives outside Claude Code&apos;s expected locations (for example .vscode/mcp.json and .github/agents), and from not saying early whether you want suggestions only or direct edits. <a href="#section-friction" class="see-more">Where Things Go Wrong →</a></div>
+        <div class="glance-section"><strong>Quick wins to try:</strong> Move your Playwright agents into .claude/agents/ as Task Agents, and add a short CLAUDE.md note that says &apos;use playwright-cli, not MCP&apos; and where your skills live. That should stop the repeated &apos;agent not found&apos; detours. Then replace the model-driven blockquote export with a small script that you run from a Custom Skill or an end-of-session Hook. The output will be verbatim and identical every time, at almost no token cost. <a href="#section-features" class="see-more">Features to Try →</a></div>
+        <div class="glance-section"><strong>Ambitious workflows:</strong> Soon you should be able to hand Claude a test-plan markdown file and get back a green branch. Claude would explore the app, generate POM specs, loop through lint, typecheck and runs, and use a healer subagent to sort test defects from app regressions without weakening assertions. Parallel subagents could also audit plans, specs, feature docs and portfolio links for drift and produce one gap report for you to approve. To prepare, start committing at verified checkpoints, which gives these longer autonomous runs safe rollback points. <a href="#section-horizon" class="see-more">On the Horizon →</a></div>
+      </div>
+    </div>
+    
+
+    <nav class="nav-toc">
+      <a href="#section-work">What You Work On</a>
+      <a href="#section-usage">How You Use CC</a>
+      <a href="#section-wins">Impressive Things</a>
+      <a href="#section-friction">Where Things Go Wrong</a>
+      <a href="#section-features">Features to Try</a>
+      <a href="#section-patterns">New Usage Patterns</a>
+      <a href="#section-horizon">On the Horizon</a>
+      <a href="#section-feedback">Team Feedback</a>
+    </nav>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-value">224</div><div class="stat-label">Messages</div></div>
+      <div class="stat"><div class="stat-value">+8,113/-879</div><div class="stat-label">Lines</div></div>
+      <div class="stat"><div class="stat-value">152</div><div class="stat-label">Files</div></div>
+      <div class="stat"><div class="stat-value">8</div><div class="stat-label">Days</div></div>
+      <div class="stat"><div class="stat-value">28</div><div class="stat-label">Msgs/Day</div></div>
+    </div>
+
+    
+    <h2 id="section-work">What You Work On</h2>
+    <div class="project-areas">
+      
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">BuggyBoard Test Plan Authoring &amp; Live Exploration</span>
+            <span class="area-count">~6 sessions</span>
+          </div>
+          <div class="area-desc">Created and refined markdown test plans for delete-bug and board-search scenarios, including a reusable test-plan template, clearer wording for non-native readers, and spec traceability references. Claude explored the live app with playwright-cli to verify logins and flows. Friction included an initial MCP-based approach when the user wanted the CLI, and browser sessions that closed or ran headless during exploration.</div>
+        </div>
+      
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">Playwright Spec Generation &amp; Test Refactoring</span>
+            <span class="area-count">~9 sessions</span>
+          </div>
+          <div class="area-desc">Generated Playwright specs from test plans, migrated the suite to the Page Object Model with custom fixtures, split combined tests into atomic AAA tests, and moved test data to fixtures and .env credentials. Claude relied heavily on Bash to run lint, typecheck and tests, and showed that remaining failures came from pre-existing app bugs rather than the refactors. Several sessions ended with conversation exports to markdown blockquotes, which often needed self-correction for formatting.</div>
+        </div>
+      
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">Playwright Agents, MCP Setup &amp; Chat Export Tooling</span>
+            <span class="area-count">~8 sessions</span>
+          </div>
+          <div class="area-desc">Configured and invoked custom Playwright agents such as the healer, which traced one failure to an app regression in bugService.ts. Claude also troubleshot why MCP servers in .vscode/mcp.json weren&apos;t visible and looked for lower-token alternatives to the chat-to-blockquote skill. This area had the most friction: Claude was slow to find agent files in .github/agents and was uncertain about how agents register, so some sessions ended unresolved.</div>
+        </div>
+      
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">Portfolio Site, README &amp; Blog Content</span>
+            <span class="area-count">~9 sessions</span>
+          </div>
+          <div class="area-desc">Turned a forked course repo into an employer-ready portfolio, including README rewrites, a docs/learning folder structure, a CLAUDE.md, MDX home-page copy, and a blog post split into a linked series. Claude made multi-file documentation edits and fixed links broken by renames. It also debugged git author rewrites and force-push errors. Friction included an overly formal tone, edits made where only suggestions were requested, and one deliverable that didn&apos;t save.</div>
+        </div>
+      
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">Playwright API Testing Learning &amp; Debugging</span>
+            <span class="area-count">~5 sessions</span>
+          </div>
+          <div class="area-desc">A Playwright beginner asked conceptual and code-review questions about API tests, including parsing JSON responses with .find(), const vs UPPER_CASE naming, and a 401 login failure. The user also debugged odd import reporting and cleaned up an unused seeding script. Claude explained concepts and flagged bugs, but several sessions ended before root causes were confirmed.</div>
+        </div>
+      
+    </div>
+    
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">What You Wanted</div>
+        <div class="bar-row">
+        <div class="bar-label">Export Conversation</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#2563eb"></div></div>
+        <div class="bar-value">4</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Documentation Editing</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#2563eb"></div></div>
+        <div class="bar-value">4</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Export Chat To Blockquote</div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:#2563eb"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Quick Question</div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:#2563eb"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Conceptual Question</div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:#2563eb"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Debugging Git Errors</div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:#2563eb"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Top Tools Used</div>
+        <div class="bar-row">
+        <div class="bar-label">Bash</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#0891b2"></div></div>
+        <div class="bar-value">266</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Edit</div>
+        <div class="bar-track"><div class="bar-fill" style="width:66.54135338345864%;background:#0891b2"></div></div>
+        <div class="bar-value">177</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Read</div>
+        <div class="bar-track"><div class="bar-fill" style="width:60.150375939849624%;background:#0891b2"></div></div>
+        <div class="bar-value">160</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Write</div>
+        <div class="bar-track"><div class="bar-fill" style="width:39.849624060150376%;background:#0891b2"></div></div>
+        <div class="bar-value">106</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Agent</div>
+        <div class="bar-track"><div class="bar-fill" style="width:8.646616541353383%;background:#0891b2"></div></div>
+        <div class="bar-value">23</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">AskUserQuestion</div>
+        <div class="bar-track"><div class="bar-fill" style="width:6.390977443609022%;background:#0891b2"></div></div>
+        <div class="bar-value">17</div>
+      </div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Languages</div>
+        <div class="bar-row">
+        <div class="bar-label">Markdown</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#10b981"></div></div>
+        <div class="bar-value">249</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">TypeScript</div>
+        <div class="bar-track"><div class="bar-fill" style="width:63.85542168674698%;background:#10b981"></div></div>
+        <div class="bar-value">159</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">JSON</div>
+        <div class="bar-track"><div class="bar-fill" style="width:3.2128514056224895%;background:#10b981"></div></div>
+        <div class="bar-value">8</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">JavaScript</div>
+        <div class="bar-track"><div class="bar-fill" style="width:0.8032128514056224%;background:#10b981"></div></div>
+        <div class="bar-value">2</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">YAML</div>
+        <div class="bar-track"><div class="bar-fill" style="width:0.4016064257028112%;background:#10b981"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Session Types</div>
+        <div class="bar-row">
+        <div class="bar-label">Multi Task</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#8b5cf6"></div></div>
+        <div class="bar-value">19</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Iterative Refinement</div>
+        <div class="bar-track"><div class="bar-fill" style="width:57.89473684210527%;background:#8b5cf6"></div></div>
+        <div class="bar-value">11</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Exploration</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15.789473684210526%;background:#8b5cf6"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Single Task</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15.789473684210526%;background:#8b5cf6"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Quick Question</div>
+        <div class="bar-track"><div class="bar-fill" style="width:5.263157894736842%;background:#8b5cf6"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+      </div>
+    </div>
+
+    
+    <h2 id="section-usage">How You Use Claude Code</h2>
+    <div class="narrative">
+      <p>You work in <strong>short, goal-stacked sessions</strong>: about 5 messages per session on average, yet 61 hours in total. Once a task is framed, you let Claude run for long stretches. Bash, Edit, Read and Write dominate the tool usage. You lean on structured workflows: plan mode (13 ExitPlanMode calls), clarifying questions (17 AskUserQuestion calls) and delegated agents such as the Playwright healer and planner. Your requests are usually concise but anchored to a reference artifact. You say things like &quot;align board-search tests to the delete-bug beforeEach/afterEach approach&quot; or &quot;edit the text files to match the portfolio README guide.&quot; In other words, <strong>you specify by pointing at an existing pattern rather than writing long upfront specs</strong>, and you expect Claude to infer the conventions. You rarely interrupt. The one clear case was halting Claude&apos;s attempt to descope the Scenario 1.8 normalization bug.</p>
+<p>The most distinctive habit is <strong>ending sessions with a chat-export ritual</strong>. Many sessions finish with &quot;export the chat as a blockquote&quot; or &quot;collapsible markdown.&quot; You care about verbatim fidelity: correct &apos;&gt;&apos; prefixes, no paraphrased narration, and even the reasoning steps included. This fits a broader <strong>learning-and-portfolio orientation</strong>. You are building a QA/tester portfolio: study-note structures under /docs/learning, raw logs kept in the repo, a CLAUDE.md for your blog, and beginner questions like const vs UPPER_CASE. <strong>You treat Claude as both a pair-programmer and a documentation engine for your own growth.</strong></p>
+<p>When Claude drifts, <strong>you correct firmly and specifically rather than abandoning the task</strong>. Examples include re-issuing a request that explicitly forbade MCP tools and pointed to the skills path, pointing Claude to .github/agents when it claimed the healer agent was unavailable, pushing back on an overly formal README tone, and overriding advice about keeping logs out of the repo. You also share context that changes Claude&apos;s answer, such as noting you never run the seeding npm script, which made the file safe to delete. Wrong approach was the top friction category (13 instances), and much of it came from <strong>tooling and agent setup (MCP, custom Playwright agents, skills)</strong>. That is where your sessions most often end unresolved. Test generation and refactoring, by contrast, usually land well: POM migration, atomic AAA tests and fixture/.env refactors. You tend to keep issuing follow-ups instead of giving explicit sign-off, so silence usually means acceptance.</p>
+      <div class="key-insight"><strong>Key pattern:</strong> You chain concise, reference-anchored requests, let Claude execute autonomously, correct its approach bluntly when it strays from your chosen tools, and routinely close sessions by exporting the conversation verbatim for your learning portfolio.</div>
+    </div>
+    
+
+    <!-- Response Time Distribution -->
+    <div class="chart-card" style="margin: 24px 0;">
+      <div class="chart-title">User Response Time Distribution</div>
+      <div class="bar-row">
+        <div class="bar-label">2-10s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:28.205128205128204%;background:#6366f1"></div></div>
+        <div class="bar-value">11</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">10-30s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:56.41025641025641%;background:#6366f1"></div></div>
+        <div class="bar-value">22</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">30s-1m</div>
+        <div class="bar-track"><div class="bar-fill" style="width:87.17948717948718%;background:#6366f1"></div></div>
+        <div class="bar-value">34</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">1-2m</div>
+        <div class="bar-track"><div class="bar-fill" style="width:87.17948717948718%;background:#6366f1"></div></div>
+        <div class="bar-value">34</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">2-5m</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#6366f1"></div></div>
+        <div class="bar-value">39</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">5-15m</div>
+        <div class="bar-track"><div class="bar-fill" style="width:64.1025641025641%;background:#6366f1"></div></div>
+        <div class="bar-value">25</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">>15m</div>
+        <div class="bar-track"><div class="bar-fill" style="width:12.82051282051282%;background:#6366f1"></div></div>
+        <div class="bar-value">5</div>
+      </div>
+      <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+        Median: 78.3s &bull; Average: 175.3s
+      </div>
+    </div>
+
+    <!-- Multi-clauding Section (matching Python reference) -->
+    <div class="chart-card" style="margin: 24px 0;">
+      <div class="chart-title">Multi-Clauding (Parallel Sessions)</div>
+      
+        <div style="display: flex; gap: 24px; margin: 12px 0;">
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #7c3aed;">5</div>
+            <div style="font-size: 11px; color: #64748b; text-transform: uppercase;">Overlap Events</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #7c3aed;">9</div>
+            <div style="font-size: 11px; color: #64748b; text-transform: uppercase;">Sessions Involved</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #7c3aed;">12%</div>
+            <div style="font-size: 11px; color: #64748b; text-transform: uppercase;">Of Messages</div>
+          </div>
+        </div>
+        <p style="font-size: 13px; color: #475569; margin-top: 12px;">
+          You run multiple Claude Code sessions simultaneously. Multi-clauding is detected when sessions
+          overlap in time, suggesting parallel workflows.
+        </p>
+      
+    </div>
+
+    <!-- Time of Day & Tool Errors -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title" style="display: flex; align-items: center; gap: 12px;">
+          User Messages by Time of Day
+          <select id="timezone-select" style="font-size: 12px; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+            <option value="0">PT (UTC-8)</option>
+            <option value="3">ET (UTC-5)</option>
+            <option value="8">London (UTC)</option>
+            <option value="9">CET (UTC+1)</option>
+            <option value="17">Tokyo (UTC+9)</option>
+            <option value="custom">Custom offset...</option>
+          </select>
+          <input type="number" id="custom-offset" placeholder="UTC offset" style="display: none; width: 80px; font-size: 12px; padding: 4px; border-radius: 4px; border: 1px solid #e2e8f0;">
+        </div>
+        <div id="hour-histogram">
+      <div class="bar-row">
+        <div class="bar-label">Morning (6-12)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:8.737864077669903%;background:#8b5cf6"></div></div>
+        <div class="bar-value">18</div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">Afternoon (12-18)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#8b5cf6"></div></div>
+        <div class="bar-value">206</div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">Evening (18-24)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%;background:#8b5cf6"></div></div>
+        <div class="bar-value">0</div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">Night (0-6)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%;background:#8b5cf6"></div></div>
+        <div class="bar-value">0</div>
+      </div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Tool Errors Encountered</div>
+        <div class="bar-row">
+        <div class="bar-label">Command Failed</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
+        <div class="bar-value">13</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Other</div>
+        <div class="bar-track"><div class="bar-fill" style="width:76.92307692307693%;background:#dc2626"></div></div>
+        <div class="bar-value">10</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">User Rejected</div>
+        <div class="bar-track"><div class="bar-fill" style="width:61.53846153846154%;background:#dc2626"></div></div>
+        <div class="bar-value">8</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">File Not Found</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15.384615384615385%;background:#dc2626"></div></div>
+        <div class="bar-value">2</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Edit Failed</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15.384615384615385%;background:#dc2626"></div></div>
+        <div class="bar-value">2</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">File Changed</div>
+        <div class="bar-track"><div class="bar-fill" style="width:7.6923076923076925%;background:#dc2626"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+      </div>
+    </div>
+
+    
+    <h2 id="section-wins">Impressive Things You Did</h2>
+    <p class="section-intro">Over 44 sessions in three weeks, you mostly used Claude Code to build a Playwright test suite for BuggyBoard and to turn that work into an employer-ready portfolio and blog.</p>
+    <div class="big-wins">
+      
+        <div class="big-win">
+          <div class="big-win-title">Plan-First, Spec-Driven Test Development</div>
+          <div class="big-win-desc">You work through a clear sequence. You build a test plan from live exploration, turn it into a reusable template, generate atomic AAA-style specs with proper beforeEach/afterEach setup, and then run gap analysis between the plan and board.spec.ts. Because every test traces back to a documented scenario, even adding spec traceability references to board.md, Claude can deliver multi-file changes that pass on the first run and separate real regressions from pre-existing app bugs.</div>
+        </div>
+      
+        <div class="big-win">
+          <div class="big-win-title">Verification-Backed Refactors</div>
+          <div class="big-win-desc">Your larger refactors come with proof, including the full POM-with-fixtures migration, moving credentials to .env, and splitting combined tests into atomic ones. You expect lint, typecheck and runtime runs to confirm them, and you compare failures against the original file so new breakage isn&apos;t confused with existing flakiness. Your git mv renames and reference checks before deleting the seeding script show the same care for keeping the suite green and the repo clean.</div>
+        </div>
+      
+        <div class="big-win">
+          <div class="big-win-title">Turning Work Into Portfolio Artefacts</div>
+          <div class="big-win-desc">You routinely export sessions as verbatim blockquote transcripts and organize study notes under /docs/learning. You also reframe course material into a portfolio README, a blog series and a CLAUDE.md tuned to your tester voice. Pushing back on tone and insisting that raw logs stay in the repo shows you steer Claude toward your goals instead of accepting its defaults, and the result is a public record of your testing skills.</div>
+        </div>
+      
+    </div>
+    
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">What Helped Most (Claude's Capabilities)</div>
+        <div class="bar-row">
+        <div class="bar-label">Multi-file Changes</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#16a34a"></div></div>
+        <div class="bar-value">11</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Good Explanations</div>
+        <div class="bar-track"><div class="bar-fill" style="width:72.72727272727273%;background:#16a34a"></div></div>
+        <div class="bar-value">8</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Correct Code Edits</div>
+        <div class="bar-track"><div class="bar-fill" style="width:54.54545454545454%;background:#16a34a"></div></div>
+        <div class="bar-value">6</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Good Debugging</div>
+        <div class="bar-track"><div class="bar-fill" style="width:45.45454545454545%;background:#16a34a"></div></div>
+        <div class="bar-value">5</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Proactive Help</div>
+        <div class="bar-track"><div class="bar-fill" style="width:36.36363636363637%;background:#16a34a"></div></div>
+        <div class="bar-value">4</div>
+      </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Outcomes</div>
+        <div class="bar-row">
+        <div class="bar-label">Not Achieved</div>
+        <div class="bar-track"><div class="bar-fill" style="width:5.555555555555555%;background:#8b5cf6"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Partially Achieved</div>
+        <div class="bar-track"><div class="bar-fill" style="width:27.77777777777778%;background:#8b5cf6"></div></div>
+        <div class="bar-value">5</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Mostly Achieved</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#8b5cf6"></div></div>
+        <div class="bar-value">18</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Fully Achieved</div>
+        <div class="bar-track"><div class="bar-fill" style="width:50%;background:#8b5cf6"></div></div>
+        <div class="bar-value">9</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Unclear</div>
+        <div class="bar-track"><div class="bar-fill" style="width:22.22222222222222%;background:#8b5cf6"></div></div>
+        <div class="bar-value">4</div>
+      </div>
+      </div>
+    </div>
+
+    
+    <h2 id="section-friction">Where Things Go Wrong</h2>
+    <p class="section-intro">Your friction clusters around Claude not using the custom Playwright tooling you had already set up, around chat-to-blockquote exports that need rework, and around Claude acting on or reversing its own judgment before it fully understood your intent.</p>
+    <div class="friction-categories">
+      
+        <div class="friction-category">
+          <div class="friction-title">Custom agents, skills and MCP tools not recognized or not loaded</div>
+          <div class="friction-desc">Claude often failed to find or use the Playwright agents, skills and MCP servers you had set up, so you had to point to paths and re-issue requests. You could add a CLAUDE.md note listing where your agents live (e.g., .github/agents vs .claude/agents), which tools to use (CLI vs MCP), and a quick check to confirm the tools are loaded at the start of a session.</div>
+          <ul class="friction-examples"><li>Claude said the healer agent was unavailable without checking .github/agents. After you corrected it, it wrote a settings.json that may not register agents where Claude Code looks for them. The healer-fix session ended without the test being fixed.</li><li>You asked for Playwright CLI with skills, but Claude delegated to an MCP-based planner agent. You had to repeat the request, explicitly forbid MCP and give the skills path. In another session the MCP tools weren&apos;t exposed at all, so the scenario never ran.</li></ul>
+        </div>
+      
+        <div class="friction-category">
+          <div class="friction-title">Repeated rework on blockquote chat exports</div>
+          <div class="friction-desc">You export chats often (7+ goals), and first attempts regularly broke your format rules: missing &apos;&gt;&apos; prefixes, paraphrased narration, or files saved where you couldn&apos;t see them. You could encode the exact rules in the skill: prefix every line including blank ones, keep text verbatim, exclude reasoning, and save to a named repo path. You could also add a self-check step to the skill.</div>
+          <ul class="friction-examples"><li>The first export didn&apos;t prefix lines with &apos;&gt;&apos; or include the full verbatim text, so the file had to be rebuilt. Another export left blank lines without &apos;&gt;&apos; and needed a second correction.</li><li>Claude saved one export to a scratchpad you couldn&apos;t access, so you had to ask for it inline. Separately, the auto-invoked skill kept consuming tokens even after Claude suggested asking without it.</li></ul>
+        </div>
+      
+        <div class="friction-category">
+          <div class="friction-title">Acting on or reversing advice before confirming your intent</div>
+          <div class="friction-desc">Claude sometimes gave firm advice or made edits based on assumptions about your workflow, and you had to override or interrupt it. You can state up front whether you want suggestions only or direct edits. Share context like &apos;I never run this script&apos; early, and ask Claude to confirm before deleting or descoping anything.</div>
+          <ul class="friction-examples"><li>Claude first said not to delete the seeding script because references existed and reversed only after you explained you never run it. It also advised keeping raw prompt logs out of the repo, which you had to override.</li><li>Claude tried to delete a terse note in session-notes.md as a leftover placeholder and began descoping Scenario 1.8 until you interrupted. When you asked only for README suggestions, it edited the file directly.</li></ul>
+        </div>
+      
+    </div>
+    
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Primary Friction Types</div>
+        <div class="bar-row">
+        <div class="bar-label">Wrong Approach</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
+        <div class="bar-value">13</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Buggy Code</div>
+        <div class="bar-track"><div class="bar-fill" style="width:38.46153846153847%;background:#dc2626"></div></div>
+        <div class="bar-value">5</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Misunderstood Request</div>
+        <div class="bar-track"><div class="bar-fill" style="width:23.076923076923077%;background:#dc2626"></div></div>
+        <div class="bar-value">3</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">User Rejected Action</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15.384615384615385%;background:#dc2626"></div></div>
+        <div class="bar-value">2</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Excessive Changes</div>
+        <div class="bar-track"><div class="bar-fill" style="width:7.6923076923076925%;background:#dc2626"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Environment Issues</div>
+        <div class="bar-track"><div class="bar-fill" style="width:7.6923076923076925%;background:#dc2626"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Inferred Satisfaction (model-estimated)</div>
+        <div class="bar-row">
+        <div class="bar-label">Dissatisfied</div>
+        <div class="bar-track"><div class="bar-fill" style="width:10%;background:#eab308"></div></div>
+        <div class="bar-value">6</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Likely Satisfied</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:#eab308"></div></div>
+        <div class="bar-value">60</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Satisfied</div>
+        <div class="bar-track"><div class="bar-fill" style="width:10%;background:#eab308"></div></div>
+        <div class="bar-value">6</div>
+      </div>
+<div class="bar-row">
+        <div class="bar-label">Happy</div>
+        <div class="bar-track"><div class="bar-fill" style="width:1.6666666666666667%;background:#eab308"></div></div>
+        <div class="bar-value">1</div>
+      </div>
+      </div>
+    </div>
+
+    
+    
+    <h2 id="section-features">Existing CC Features to Try</h2>
+    <div class="claude-md-section">
+      <h3>Suggested CLAUDE.md Additions</h3>
+      <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Just copy this into Claude Code to add it to your CLAUDE.md.</p>
+      <div class="claude-md-actions">
+        <button class="copy-all-btn" onclick="copyAllCheckedClaudeMd()">Copy All Checked</button>
+      </div>
+      
+        <div class="claude-md-item">
+          <input type="checkbox" id="cmd-0" class="cmd-checkbox" checked data-text="Add as a new ## Chat exports section near the top of CLAUDE.md, or move these rules into the export skill itself (see features_to_try).\n\n## Chat exports
+- When asked to export the chat, write it to `docs/learning/chat-logs/YYYY-MM-DD-&lt;topic&gt;.md` in the repo, never to a scratchpad or temp path. Report the file path when done.
+- Use blockquote format: prefix EVERY line with `&gt; `, including blank lines (use `&gt;` alone).
+- Copy user and assistant messages verbatim. Do not paraphrase or add narration for tool calls; list them as `&gt; [tool: &lt;name&gt;]` only.
+- Internal reasoning is not available. Say so once at the top instead of apologising in each export.">
+          <label for="cmd-0">
+            <code class="cmd-code">## Chat exports
+- When asked to export the chat, write it to `docs/learning/chat-logs/YYYY-MM-DD-&lt;topic&gt;.md` in the repo, never to a scratchpad or temp path. Report the file path when done.
+- Use blockquote format: prefix EVERY line with `&gt; `, including blank lines (use `&gt;` alone).
+- Copy user and assistant messages verbatim. Do not paraphrase or add narration for tool calls; list them as `&gt; [tool: &lt;name&gt;]` only.
+- Internal reasoning is not available. Say so once at the top instead of apologising in each export.</code>
+            <button class="copy-btn" onclick="copyCmdItem(0)">Copy</button>
+          </label>
+          <div class="cmd-why">Chat export was the most frequent goal (7+ sessions), and the same mistakes kept happening: a missing &apos;&gt;&apos; prefix, paraphrased tool narration, and files saved where you couldn&apos;t see them.</div>
+        </div>
+      
+        <div class="claude-md-item">
+          <input type="checkbox" id="cmd-1" class="cmd-checkbox" checked data-text="Add under a ## Tooling or ## Testing section.\n\n## Playwright tooling
+- Default to Playwright CLI (`npx playwright ...` / playwright-cli skills) for exploration and test runs. Do NOT use Playwright MCP tools unless I explicitly ask for them.
+- Custom Playwright agents (planner, generator, healer) live in `.github/agents/` and `.claude/agents/`. Check both before saying an agent is unavailable.
+- Run the browser headed during exploration (`--headed`) so I can watch.">
+          <label for="cmd-1">
+            <code class="cmd-code">## Playwright tooling
+- Default to Playwright CLI (`npx playwright ...` / playwright-cli skills) for exploration and test runs. Do NOT use Playwright MCP tools unless I explicitly ask for them.
+- Custom Playwright agents (planner, generator, healer) live in `.github/agents/` and `.claude/agents/`. Check both before saying an agent is unavailable.
+- Run the browser headed during exploration (`--headed`) so I can watch.</code>
+            <button class="copy-btn" onclick="copyCmdItem(1)">Copy</button>
+          </label>
+          <div class="cmd-why">Several sessions lost time because Claude used MCP instead of the CLI, said the healer agent didn&apos;t exist without checking the agents folders, or ran exploration headless.</div>
+        </div>
+      
+        <div class="claude-md-item">
+          <input type="checkbox" id="cmd-2" class="cmd-checkbox" checked data-text="Add under ## Testing. Update the known-bugs line when the app bug is fixed.\n\n## Test conventions
+- Tests are atomic and follow Arrange-Act-Assert, with setup and teardown in `beforeEach`/`afterEach` (see the delete-bug spec as the reference pattern).
+- Use Page Object Model classes plus custom fixtures. Test data goes in fixtures files, and credentials come from `.env` only (never hardcode them).
+- Relative imports in TypeScript must include the `.js` extension.
+- Run with `--workers=1` when tests share the database.
+- After changing tests, run typecheck, lint, and the affected specs. If tests fail, compare against the original/main version before calling it a regression.
+- Known app bug: Scenario 1.8 (login/log-in search normalization) fails because of the app, not the test. Do not descope or skip it without asking.">
+          <label for="cmd-2">
+            <code class="cmd-code">## Test conventions
+- Tests are atomic and follow Arrange-Act-Assert, with setup and teardown in `beforeEach`/`afterEach` (see the delete-bug spec as the reference pattern).
+- Use Page Object Model classes plus custom fixtures. Test data goes in fixtures files, and credentials come from `.env` only (never hardcode them).
+- Relative imports in TypeScript must include the `.js` extension.
+- Run with `--workers=1` when tests share the database.
+- After changing tests, run typecheck, lint, and the affected specs. If tests fail, compare against the original/main version before calling it a regression.
+- Known app bug: Scenario 1.8 (login/log-in search normalization) fails because of the app, not the test. Do not descope or skip it without asking.</code>
+            <button class="copy-btn" onclick="copyCmdItem(2)">Copy</button>
+          </label>
+          <div class="cmd-why">You re-explained the AAA/beforeEach pattern, POM plus fixtures, and baseline comparisons across many sessions, and the missing `.js` extensions and shared-DB parallel runs each caused rework.</div>
+        </div>
+      
+        <div class="claude-md-item">
+          <input type="checkbox" id="cmd-3" class="cmd-checkbox" checked data-text="Add as a ## Working style section at the top of CLAUDE.md.\n\n## Working style
+- If I ask for &apos;suggestions&apos;, &apos;review&apos;, or &apos;is it safe to…&apos;, reply with recommendations only. Do not edit files until I confirm.
+- When a request names several files, address each one explicitly in the answer.
+- Writing tone for README/blog/portfolio: clear, friendly, and plain English for non-native readers. Avoid overly formal or corporate wording.
+- Never delete notes or content that look like placeholders without asking first.">
+          <label for="cmd-3">
+            <code class="cmd-code">## Working style
+- If I ask for &apos;suggestions&apos;, &apos;review&apos;, or &apos;is it safe to…&apos;, reply with recommendations only. Do not edit files until I confirm.
+- When a request names several files, address each one explicitly in the answer.
+- Writing tone for README/blog/portfolio: clear, friendly, and plain English for non-native readers. Avoid overly formal or corporate wording.
+- Never delete notes or content that look like placeholders without asking first.</code>
+            <button class="copy-btn" onclick="copyCmdItem(3)">Copy</button>
+          </label>
+          <div class="cmd-why">Friction came up when Claude edited files after being asked only for suggestions, reviewed one of two requested files, used a tone that was too formal, and nearly deleted a real note.</div>
+        </div>
+      
+    </div>
+    
+    
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Just copy this into Claude Code and it'll set it up for you.</p>
+    <div class="features-section">
+      
+        <div class="feature-card">
+          <div class="feature-title">Custom Skills</div>
+          <div class="feature-oneliner">Reusable /commands defined as markdown files.</div>
+          <div class="feature-why"><strong>Why for you:</strong> You export chats in almost every session, and one session was spent trying to lower the token cost. A dedicated skill with strict rules would make every export correct on the first try. For lower token use, the skill could run a small local script over the session transcript instead of retyping the chat. Verify the transcript location on your machine first; it is typically a JSONL file under ~/.claude/projects/.</div>
+          
+          <div class="feature-examples">
+            <div class="feature-example">
+              <div class="example-code-row">
+                <code class="example-code"># .claude/skills/export-chat/SKILL.md
+---
+name: export-chat
+description: Export the current conversation as a verbatim blockquote markdown file
+---
+1. Save to docs/learning/chat-logs/YYYY-MM-DD-&lt;topic&gt;.md (inside the repo).
+2. Prefix every line with &apos;&gt; &apos;, and blank lines with &apos;&gt;&apos;.
+3. Copy messages verbatim. Show tools as &apos;&gt; [tool: Name]&apos; with no paraphrasing.
+4. Note at the top that internal reasoning is not included.
+5. Re-read the file, check for any line missing the &apos;&gt;&apos; prefix, then print the path.</code>
+                <button class="copy-btn" onclick="copyText(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      
+        <div class="feature-card">
+          <div class="feature-title">Hooks</div>
+          <div class="feature-oneliner">Shell commands that run automatically at lifecycle events, such as after an edit.</div>
+          <div class="feature-why"><strong>Why for you:</strong> Typecheck and lint errors (missing `.js` extensions, wrong selectors) were found late and needed several fix rounds. An automatic typecheck after each edit catches them right away.</div>
+          
+          <div class="feature-examples">
+            <div class="feature-example">
+              <div class="example-code-row">
+                <code class="example-code">// .claude/settings.json
+{
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Edit|Write&quot;,
+        &quot;hooks&quot;: [
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npx tsc --noEmit 2&gt;&amp;1 | head -30; npx eslint . --quiet 2&gt;&amp;1 | head -30&quot; }
+        ]
+      }
+    ]
+  }
+}</code>
+                <button class="copy-btn" onclick="copyText(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      
+        <div class="feature-card">
+          <div class="feature-title">Task Agents</div>
+          <div class="feature-oneliner">Focused subagents that Claude delegates to, defined as files in .claude/agents/.</div>
+          <div class="feature-why"><strong>Why for you:</strong> Three sessions failed or stalled because Claude Code couldn&apos;t find your Playwright healer/planner agents. Claude Code reads subagents from `.claude/agents/`, not `.github/agents/`. Recent Playwright versions can generate agents for Claude directly. Check the Playwright docs for your version to confirm the flag.</div>
+          
+          <div class="feature-examples">
+            <div class="feature-example">
+              <div class="example-code-row">
+                <code class="example-code">npx playwright init-agents --loop=claude
+# then confirm the agents are listed:
+ls .claude/agents/
+# in Claude Code, run /agents to confirm, then:
+# &quot;Use the playwright-test-healer agent to fix the failing test in board-search.spec.ts&quot;</code>
+                <button class="copy-btn" onclick="copyText(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      
+    </div>
+    
+    
+    <h2 id="section-patterns">New Ways to Use Claude Code</h2>
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Just copy this into Claude Code and it'll walk you through it.</p>
+    <div class="patterns-section">
+      
+        <div class="pattern-card">
+          <div class="pattern-title">Commit at checkpoints (0 commits in 61 hours)</div>
+          <div class="pattern-summary">Ask Claude to commit after each verified step so you have easy rollback points.</div>
+          <div class="pattern-detail">You made large multi-file changes, such as the POM migration, file renames, and blog restructuring, with no commits recorded. If a refactor goes wrong, a checkpoint makes rollback simple. It also keeps your portfolio history clean, so you won&apos;t need another author-fix force-push later. Check `git config user.name/user.email` once per repo so commits have the right author.</div>
+          
+          <div class="copyable-prompt-section">
+            <div class="prompt-label">Paste into Claude Code:</div>
+            <div class="copyable-prompt-row">
+              <code class="copyable-prompt">After tests, typecheck and lint pass for this change, show me the diff summary and propose a conventional commit message. Wait for my OK before committing. Do not push.</code>
+              <button class="copy-btn" onclick="copyText(this)">Copy</button>
+            </div>
+          </div>
+          
+        </div>
+      
+        <div class="pattern-card">
+          <div class="pattern-title">Get a baseline before changing tests</div>
+          <div class="pattern-summary">Record which tests already fail before refactoring, so new failures are obvious.</div>
+          <div class="pattern-detail">In several sessions (the board-search split, the POM migration, Scenario 1.8), time went into proving that failures were pre-existing app bugs or caused by the shared database. Running the suite once at the start with a single worker gives a clear before/after comparison. It also stops Claude from &apos;fixing&apos; tests to hide real app bugs.</div>
+          
+          <div class="copyable-prompt-section">
+            <div class="prompt-label">Paste into Claude Code:</div>
+            <div class="copyable-prompt-row">
+              <code class="copyable-prompt">Before editing anything, run the affected specs with --workers=1 and list the current pass/fail results. Then make the change, re-run, and give me a before/after table. Flag any new failures separately from known app bugs.</code>
+              <button class="copy-btn" onclick="copyText(this)">Copy</button>
+            </div>
+          </div>
+          
+        </div>
+      
+        <div class="pattern-card">
+          <div class="pattern-title">Say &apos;plan only&apos; when you want advice</div>
+          <div class="pattern-summary">Use plan mode or state explicitly when you want recommendations and no edits.</div>
+          <div class="pattern-detail">Several friction points came from Claude acting before you had decided: editing the README when you asked for suggestions, delegating to an MCP planner, and trying to delete a note. You already use plan mode (13 ExitPlanMode calls), and it works well for multi-file edits. Using it for &apos;is it safe to…&apos; and &apos;what should I change&apos; questions keeps you in control.</div>
+          
+          <div class="copyable-prompt-section">
+            <div class="prompt-label">Paste into Claude Code:</div>
+            <div class="copyable-prompt-row">
+              <code class="copyable-prompt">Plan only, no file edits: review README.md and docs/learning/ and suggest what to add, remove or tweak for an employer audience. Group the suggestions by file and wait for me to pick which ones to apply.</code>
+              <button class="copy-btn" onclick="copyText(this)">Copy</button>
+            </div>
+          </div>
+          
+        </div>
+      
+    </div>
+    
+    
+
+    
+    <h2 id="section-horizon">On the Horizon</h2>
+    <p class="section-intro">Your work is moving from one-off Playwright test edits toward workflows where Claude plans, writes, runs, heals and documents tests with little supervision, provided the agent setup and test environment are reliable.</p>
+    <div class="horizon-section">
+      
+        <div class="horizon-card">
+          <div class="horizon-title">Autonomous plan-to-green Playwright pipeline</div>
+          <div class="horizon-possible">Claude could take a test-plan markdown file and handle the rest: explore the app with playwright-cli, generate POM-based specs with fixtures, run them, and loop through lint, typecheck and failures until the suite passes. Parallel subagents could each own one scenario. A healer subagent would sort failures into test defects or app regressions (like the bugService.ts case) and report app bugs instead of weakening assertions. You would review a finished branch with a traceability report, not step through each fix.</div>
+          <div class="horizon-tip"><strong>Getting started:</strong> Move your planner, generator and healer definitions into .claude/agents/ so Claude Code can discover them, and register the Playwright MCP with `claude mcp add` if needed. Give each Playwright worker its own database or seed data to avoid the shared-DB interference you saw.</div>
+          <div class="pattern-prompt"><div class="prompt-label">Paste into Claude Code:</div><code>Act as an orchestrator for the test plan at specs/&lt;feature&gt;.md. Step 1: List every scenario and confirm the subagents in .claude/agents/ (planner, generator, healer) are available; stop and tell me if any are missing. Step 2: For each scenario, launch a generator subagent in parallel that writes an atomic Arrange-Act-Assert test using our existing POM classes and fixtures. Use .js extensions on relative imports, and use beforeEach/afterEach setup and teardown that creates and deletes its own data, with no shared state. Step 3: Run `npm run lint`, `npx tsc --noEmit` and `npx playwright test &lt;spec&gt; --workers=1`, then iterate on failures, up to 5 rounds per test. Step 4: For any test that still fails, run the healer subagent. It must classify the failure as a TEST defect (fix it) or an APP defect (do not change the assertion; mark it with test.fixme and a comment citing the scenario ID and suspected source file). Step 5: Produce a summary table with columns scenario ID, test name, status, and notes/app-bug reference. Also include a list of files changed. Do not commit, do not edit application source code, and do not touch .env files.</code><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+        </div>
+      
+        <div class="horizon-card">
+          <div class="horizon-title">Zero-token deterministic chat-to-blockquote export</div>
+          <div class="horizon-possible">Chat export was your most frequent request, and it caused repeated friction: missing &apos;&gt;&apos; prefixes, paraphrased tool calls, files saved where you couldn&apos;t see them, and high token cost. A small script could convert the session transcript into verbatim, collapsible blockquote markdown with no model involvement, so the output is identical every time. A hook or slash command could run it automatically at the end of each session and write the file into your /docs/learning/raw-logs folder.</div>
+          <div class="horizon-tip"><strong>Getting started:</strong> Have Claude write a Node/TypeScript script that parses the local session transcript file, plus a /export-blockquote slash command that runs it. Optionally add a Claude Code hook to run it at session end. Check the current Claude Code docs for the transcript location and available hook events.</div>
+          <div class="pattern-prompt"><div class="prompt-label">Paste into Claude Code:</div><code>Build a deterministic chat exporter so I stop spending tokens on it. Requirements: (1) Create scripts/export-chat.ts that takes a Claude Code session transcript file path (default: the most recent transcript for this project) and writes docs/learning/raw-logs/YYYY-MM-DD-&lt;slug&gt;.md. (2) The output must be verbatim. Every line, including blank lines, must be prefixed with &apos;&gt;&apos;. User and assistant turns go under bold role labels, and each tool call and result goes inside a &lt;details&gt;&lt;summary&gt;Tool: NAME&lt;/summary&gt; block. No paraphrasing or narration. (3) Add a redaction pass that masks anything resembling passwords, tokens, API keys, cookies or connection strings, and anything read from .env files, then prints a count of redactions. (4) Add a --dry-run flag that prints to stdout without writing. (5) Write a small unit test with a fixture transcript that asserts the &apos;&gt;&apos; prefix rule and the redaction rule. (6) Create .claude/commands/export-blockquote.md that runs the script and prints the output file path. First show me the plan and the transcript fields you will rely on. State any uncertainty about the transcript format before writing code.</code><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+        </div>
+      
+        <div class="horizon-card">
+          <div class="horizon-title">Parallel traceability audit across plans, specs, docs</div>
+          <div class="horizon-possible">Your repo has test plans, feature specs, Playwright specs and portfolio docs that drift apart, which was the source of the consistency-check misses and broken links. Parallel subagents could each audit one feature: plan vs. template, plan vs. spec file, spec vs. feature spec. A final agent would audit the portfolio docs and blog links. The result is a single gap report and a proposed fix set that you approve before anything is edited. Run in headless mode, this could later become a pre-push check that keeps your portfolio accurate and employer-ready.</div>
+          <div class="horizon-tip"><strong>Getting started:</strong> Use the Agent tool to fan out one subagent per feature and then merge the findings. Add the audit rules to CLAUDE.md so they persist. Later you could run it headlessly with `claude -p` in a local script or CI job.</div>
+          <div class="pattern-prompt"><div class="prompt-label">Paste into Claude Code:</div><code>Run a read-only traceability audit of this repo. Do not edit any files yet. Launch one subagent per feature found in the test-plans folder, in parallel. Each subagent must check: (a) the plan matches the test-plan template structure; (b) every scenario ID in the plan has a matching test in the corresponding .spec.ts, and every test maps back to a scenario; (c) every scenario references the feature spec section it covers; (d) any test.fixme/skip has a documented app-bug reason. Launch one more subagent to check README, docs/ and blog/MDX files for broken internal links, stale file names after renames, and leftover placeholders like [TODO] or bracketed unknowns. Merge all results into docs/audit/traceability-report.md with a table per feature (item, issue, severity, proposed fix). Confirm that every requested file was actually covered, and list any files you skipped and why. Then stop and ask me which fixes to apply. After I approve, apply only those fixes and re-run lint, typecheck and the affected Playwright specs to confirm nothing regressed.</code><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+        </div>
+      
+    </div>
+    
+
+    
+    <div class="fun-ending">
+      <div class="fun-headline">"Claude proudly exported the whole conversation, then saved it to a scratchpad the user couldn&apos;t see. The user had to ask for it to be pasted into the chat."</div>
+      <div class="fun-detail">This happened in a Playwright healer-agent session in September 2026, right after the healer traced a failing spec to a real app regression in bugService.ts. It was one of about seven &apos;export this chat as a blockquote&apos; requests that month. Across those, Claude also forgot the &apos;&gt;&apos; prefixes, slipped in paraphrased narration, and kept explaining that its hidden reasoning couldn&apos;t be included.</div>
+    </div>
+    
+
+    
+  </div>
+  <script>
+    function toggleCollapsible(header) {
+      header.classList.toggle('open');
+      const content = header.nextElementSibling;
+      content.classList.toggle('open');
+    }
+    function copyText(btn) {
+      const code = btn.previousElementSibling;
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+    function copyCmdItem(idx) {
+      const checkbox = document.getElementById('cmd-' + idx);
+      if (checkbox) {
+        const text = checkbox.dataset.text;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = checkbox.nextElementSibling.querySelector('.copy-btn');
+          if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy'; }, 2000); }
+        });
+      }
+    }
+    function copyAllCheckedClaudeMd() {
+      const checkboxes = document.querySelectorAll('.cmd-checkbox:checked');
+      const texts = [];
+      checkboxes.forEach(cb => {
+        if (cb.dataset.text) { texts.push(cb.dataset.text); }
+      });
+      const combined = texts.join('\n');
+      const btn = document.querySelector('.copy-all-btn');
+      if (btn) {
+        navigator.clipboard.writeText(combined).then(() => {
+          btn.textContent = 'Copied ' + texts.length + ' items!';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy All Checked'; btn.classList.remove('copied'); }, 2000);
+        });
+      }
+    }
+    // Timezone selector for time of day chart (data is from our own analytics, not user input)
+    const rawHourCounts = {"10":3,"11":15,"12":24,"13":39,"14":32,"15":38,"16":60,"17":13};
+    function updateHourHistogram(offsetFromPT) {
+      const periods = [
+        { label: "Morning (6-12)", range: [6,7,8,9,10,11] },
+        { label: "Afternoon (12-18)", range: [12,13,14,15,16,17] },
+        { label: "Evening (18-24)", range: [18,19,20,21,22,23] },
+        { label: "Night (0-6)", range: [0,1,2,3,4,5] }
+      ];
+      const adjustedCounts = {};
+      for (const [hour, count] of Object.entries(rawHourCounts)) {
+        const newHour = (parseInt(hour) + offsetFromPT + 24) % 24;
+        adjustedCounts[newHour] = (adjustedCounts[newHour] || 0) + count;
+      }
+      const periodCounts = periods.map(p => ({
+        label: p.label,
+        count: p.range.reduce((sum, h) => sum + (adjustedCounts[h] || 0), 0)
+      }));
+      const maxCount = Math.max(...periodCounts.map(p => p.count)) || 1;
+      const container = document.getElementById('hour-histogram');
+      container.textContent = '';
+      periodCounts.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        const label = document.createElement('div');
+        label.className = 'bar-label';
+        label.textContent = p.label;
+        const track = document.createElement('div');
+        track.className = 'bar-track';
+        const fill = document.createElement('div');
+        fill.className = 'bar-fill';
+        fill.style.width = (p.count / maxCount) * 100 + '%';
+        fill.style.background = '#8b5cf6';
+        track.appendChild(fill);
+        const value = document.createElement('div');
+        value.className = 'bar-value';
+        value.textContent = p.count;
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(value);
+        container.appendChild(row);
+      });
+    }
+    document.getElementById('timezone-select').addEventListener('change', function() {
+      const customInput = document.getElementById('custom-offset');
+      if (this.value === 'custom') {
+        customInput.style.display = 'inline-block';
+        customInput.focus();
+      } else {
+        customInput.style.display = 'none';
+        updateHourHistogram(parseInt(this.value));
+      }
+    });
+    document.getElementById('custom-offset').addEventListener('change', function() {
+      const parsed = parseInt(this.value, 10);
+      if (isNaN(parsed)) return;
+      updateHourHistogram(parsed + 8);
+    });
+  </script>
+</body>
+</html>
