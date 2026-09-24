@@ -1,4 +1,4 @@
-# Prompt Logs for Lesson 4 - Expanding Test Coverage
+# Prompt Logs for Lesson 7 - Expanding Test Coverage
 
 ## Session: Generating and reviewing new BuggyBoard test plans
 
@@ -13,6 +13,7 @@
 > Wrote a plan file (context, approach, and the four new test-plan files to create) and called `ExitPlanMode`. User approved.
 >
 > Wrote four new test plans, each following the constitution's required plan structure (Feature Overview → Test Scenarios with Preconditions/Steps/Expected Results tagged with spec-traceability codes → Out of Scope → Technical Information with Seed/Fixture Guidance, Locator Guidance, Spec Traceability Legend):
+>
 > - `specs/test-plans/edit-bug.md`
 > - `specs/test-plans/sort-board-columns.md`
 > - `specs/test-plans/bug-status.md`
@@ -28,13 +29,14 @@
 >
 > **Assistant:** Re-read the current `edit-bug.md`, added dedicated save scenarios for Severity, Owner, and Description (mirroring the existing Title scenario), renumbered the trailing scenarios accordingly, and removed the vague "no request made" assertion flagged earlier as part of the same edit pass.
 
-> **User:** * Test 2.1's name should be specifically for sorting the Title column header. Same for 2.2. * Test 4.1 appears to be testing for multiple sorts and can be split into individual tests...
+> **User:** *Test 2.1's name should be specifically for sorting the Title column header. Same for 2.2.* Test 4.1 appears to be testing for multiple sorts and can be split into individual tests...
 >
 > **Assistant:** Re-read `sort-board-columns.md`, renamed 2.1/2.2 to explicitly say "Title column header", and split the composite 4.1 (which chained ID → Severity → Title → Owner clicks in one scenario) into four independent single-column scenarios (4.1 ID, 4.2 Severity, 4.3 Title, 4.4 Owner) — noting that the "previous column's indicator clears" behavior stayed solely in scenario 2.3 to avoid duplicating that assertion.
 
 > **User:** As a testing expert, please review the newly generated test plans from an adversarial perspective. 1. What tests are unclear or too vague to implement? 2. Are there any tests that do not have a clear benefit to the end user? 3. Is each test unique?... 4. What else could be missing from the test plans?
 >
 > **Assistant:** Re-read all four full test plan files fresh. Reasoned through each question systematically:
+>
 > - **Vagueness:** `bug-status.md` 3.1's "visually selected (active styling)" has no accessible attribute to assert against (checked `BoardPage.tsx` — filter buttons use only a conditional CSS class, no `aria-pressed`); `edit-bug.md` 3.4's "click the dimmed backdrop" has no concrete locator; `board-severity.md` 1.1's step 1 ("Locate the severity badge...") wasn't actually a user action.
 > - **Low end-user benefit:** `edit-bug.md` 2.6 (save disabled with no changes) is a thin implementation-nicety test but still AC-linked; `bug-status.md` 2.1 (edit modal displays state) is a single-assertion setup step for 2.2.
 > - **Duplicates:** Caught that my own section-4 split in the previous turn had created real duplicates — 4.3 (Title) was nearly identical to 2.1, and 4.2 (Severity) was subsumed by 3.1's assertions — while 4.1 (ID) and 4.4 (Owner) were the only ones adding genuinely new coverage.
