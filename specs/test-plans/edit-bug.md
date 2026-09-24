@@ -25,7 +25,7 @@ BuggyBoard's Edit bug dialog lets an authenticated user open a bug from the boar
 
 **Expected Results:**
 
-1. A dialog titled "Edit bug #<id>" is visible, with the bug's actual ID interpolated. [09-AC1]
+1. A dialog titled "Edit bug (ID)" is visible, with the bug's actual ID interpolated. [09-AC1]
 2. The dialog shows an ID field, a Title field, a Severity field, an Owner field, and a Description field. [09-AC1]
 3. The dialog contains Save and Cancel buttons. [09-AC1]
 4. The ID field displays the bug's ID and is read-only (disabled or `aria-readonly`). [09-AC2]
