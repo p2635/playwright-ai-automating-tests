@@ -51,6 +51,8 @@ BuggyBoard's board table color-codes each bug's severity badge (HIGH, MID, LOW) 
 
 - Pixel-level or computed-style color-value assertions (e.g. reading `getComputedStyle` for exact hex values `#b84a2e`/`#a67c47`/`#4a6b5e`) are deferred; this plan verifies severity-to-class mapping, which is a stable proxy for the CSS custom properties defined in `specs/features/08-board-severity.md`. A future revision could assert computed color values directly if class names become an unreliable proxy.
 - The edit-bug modal's own severity dropdown color coding is covered in `specs/test-plans/edit-bug.md` (Scenario 1.2).
+- Severity coloring surviving combination with sort, filter, or search (e.g. badge classes staying correct after re-sorting or filtering the board) is not covered here; worth considering in a future revision as a regression class.
+- Keyboard-only interaction (navigating to and reading severity badges via keyboard/screen reader) is not currently tested; not in scope for this round of coverage.
 
 ## Technical Information
 
