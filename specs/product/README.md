@@ -5,5 +5,6 @@ This folder holds **product-level context**: what BuggyBoard is, who it’s for,
 - **vision.md** – What BuggyBoard is (bug tracker SUT for the Playwright course), theme (VW Beetle), main views (login, board, bug), and user model.
 - **glossary.md** – Domain terms (Bug, Board, User) so everyone uses the same language in code, APIs, and specs.
 - **braindump.md** – Raw intentions and early decisions; the source of “why” when the polished specs don’t spell it out.
+- **product-questions.md** – Open questions raised while writing specs or test plans that need a product/design decision.
 
 You can add other product artifacts here (e.g. personas, roadmap, success criteria) as the project grows.
