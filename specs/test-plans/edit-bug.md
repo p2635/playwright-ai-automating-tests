@@ -252,6 +252,8 @@ BuggyBoard's Edit bug dialog lets an authenticated user open a bug from the boar
 - Conflict detection when the same bug is edited by more than one user (last write wins), per `specs/features/09-edit-bug.md` Out of Scope.
 - Editing the bug's state field is covered separately in `specs/test-plans/bug-status.md`.
 - Per-field blank validation for Severity/Owner/Description individually (only Title is exercised as the representative blank-field case in 2.7); to be addressed in a future revision.
+- Reverting Severity/Owner/Description on cancel/X/Escape (scenarios 3.1-3.3 only exercise Title): acceptable, since discard-on-close is implemented as a single `onClose` handler that simply drops all uncommitted field state regardless of which field changed — testing one field is representative of the same code path.
+- Keyboard-only interaction (opening the edit modal via a focused board row and Enter/Space, operating modal controls via Tab/Enter) is not currently tested; not in scope for this round of coverage.
 
 ## Technical Information
 
