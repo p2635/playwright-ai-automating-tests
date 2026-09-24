@@ -6,8 +6,7 @@
       "Bash(git *)",
       "Bash(claude *)",
       "Edit",
-      "Read",
-      "mcp__playwright-test__*"
+      "Read"
     ]
   },
   "enableAllProjectMcpServers": true,
