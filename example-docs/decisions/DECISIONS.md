@@ -5,6 +5,7 @@ This document records significant decisions made while building this test suite,
 ## Format
 
 Each decision includes:
+
 - **What**: The decision made
 - **Why**: The reasoning (constraints, benefits, drawbacks avoided)
 - **Trade-off**: What we gave up to make this choice
@@ -20,6 +21,7 @@ Each decision includes:
 **What**: Organize tests using the Page Object Model pattern (one class per page).
 
 **Why**: 
+
 - Tests are more readable (describe intent, not mechanics)
 - Changes to the UI only require updating the page object, not multiple tests
 - Reusable methods reduce duplication
@@ -39,6 +41,7 @@ Each decision includes:
 **What**: Use `page.getByRole()` and `getByLabel()` instead of CSS or XPath selectors.
 
 **Why**:
+
 - Role-based locators are resilient to UI changes
 - They align with how users interact with the page (accessibility-first)
 - Less likely to break in maintenance
@@ -58,6 +61,7 @@ Each decision includes:
 **What**: Setup/teardown login and test data in `beforeEach`/`afterEach` blocks rather than Playwright `page` fixtures.
 
 **Why**:
+
 - [Your reason here — e.g., "More explicit control over test isolation", "Easier to debug", "Tests read more clearly"]
 - [Additional reason]
 
@@ -79,6 +83,7 @@ Each decision includes:
 **What**: [What was decided]
 
 **Why**: 
+
 - [Reason 1]
 - [Reason 2]
 
