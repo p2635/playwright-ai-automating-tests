@@ -21,7 +21,7 @@ BuggyBoard's board table color-codes each bug's severity badge (HIGH, MID, LOW) 
 
 **Steps:**
 
-1. Locate the severity badge for each of the three bugs.
+1. Navigate to the board page and observe the severity badges.
 
 **Expected Results:**
 
