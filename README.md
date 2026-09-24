@@ -32,8 +32,7 @@ It started as a fork of the LinkedIn Learning course [_Playwright with AI: Agent
 ```text
 backend/               Express + TypeScript API, SQLite data
 frontend/              React + TypeScript UI (Vite, Tailwind)
-tests/                 Playwright test specs (AI generated and human-reviewed)
-tests-vibed/           Playwright test specs (AI generated)
+tests/                 Playwright test specs
 specs/                 Specification docs (product, design, engineering, features)
 playwright.config.ts   Playwright test runner config
 SETUP.md               Local setup instructions
