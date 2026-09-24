@@ -150,10 +150,32 @@ BuggyBoard's board table lets an authenticated user sort bugs by clicking the ID
 1. The Severity column header has `aria-sort="descending"`. [10-AC6]
 2. The visible rows are ordered HIGH, then MID, then LOW. [10-AC6]
 
+### 4. Sort state across reload
+
+#### 4.1. [PENDING PRODUCT DECISION] Sort resets to the default (Severity descending) after reload
+
+**Preconditions:**
+
+1. Authenticate as `buggy` and open the board.
+2. Bugs exist with severities HIGH, MID, and LOW.
+3. The Title column has been sorted ascending.
+
+**Steps:**
+
+1. Reload the page.
+
+**Expected Results:**
+
+1. The bugs are displayed in descending severity order (the default sort), not still sorted by Title. [plan-only, pending product decision]
+2. The Severity column header has `aria-sort="descending"`; the Title column header has no `aria-sort` attribute. [plan-only, pending product decision]
+
+**Note:** This documents the app's current observed behavior (sort state is held only in component state and is not persisted, so it resets to the default on reload). `specs/features/10-sort-board-columns.md` does not say what should happen to the active sort across a reload. This scenario is a **regression test capturing current behavior**, not a confirmed requirement — see the open product question in `specs/product/product-questions.md` ("Sort state across page reload"). If product decides sort should persist (e.g. via URL params or localStorage), this scenario must be rewritten before being implemented as a real test.
+
 ## Out of Scope (deferred)
 
 - Interaction between sorting and the board's state filter (Open/Closed) is covered in `specs/test-plans/bug-status.md` (Scenario: "Sorting works when a state filter is applied").
 - Interaction between sorting and search is already covered by `tests/search-bug/search-bug-ui-and-state.spec.ts`.
+- Keyboard-only interaction (activating column header sort buttons via Tab/Enter/Space) is not currently tested; not in scope for this round of coverage.
 
 ## Technical Information
 
