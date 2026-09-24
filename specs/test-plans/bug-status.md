@@ -50,6 +50,44 @@ BuggyBoard tracks a bug's state (Open or Closed). New bugs are created Open; the
 3. After saving, the bug no longer appears in the board table while the Open filter is selected. [13-AC2]
 4. Selecting the Closed filter shows the bug. [13-AC2]
 
+#### 2.2. Changing state back to Open and saving updates the database and board
+
+**Preconditions:**
+
+1. Authenticate as `buggy` and open the board.
+2. A Closed bug exists with a known unique title.
+3. The board's state filter is Closed.
+
+**Steps:**
+
+1. Open the edit-bug modal for the bug.
+2. Change the State field to "Open".
+3. Click Save.
+
+**Expected Results:**
+
+1. The State field shows "Closed" before it is changed. [13-AC2]
+2. After saving, the bug no longer appears in the board table while the Closed filter is selected. [13-AC2]
+3. Selecting the Open filter shows the bug. [13-AC2]
+
+#### 2.3. Closing a bug persists after reload
+
+**Preconditions:**
+
+1. Authenticate as `buggy` and open the board.
+2. An Open bug exists with a known unique title.
+
+**Steps:**
+
+1. Open the edit-bug modal for the bug, change the State field to "Closed", and click Save.
+2. Reload the page.
+3. Select the Closed filter.
+
+**Expected Results:**
+
+1. The bug still appears under the Closed filter after reload. [13-AC2]
+2. The bug does not appear under the Open filter after reload. [13-AC2]
+
 ### 3. Board state filter defaults and toggling
 
 #### 3.1. Board state filter defaults to Open
@@ -145,6 +183,7 @@ BuggyBoard tracks a bug's state (Open or Closed). New bugs are created Open; the
 - General column-sort correctness (order per column/direction) is covered in `specs/test-plans/sort-board-columns.md`; this plan only verifies sorting stays scoped to the selected state filter.
 - General search correctness (normalization, title-only scope) is covered by the existing `tests/search-bug/*` specs; this plan only verifies search stays scoped to the selected state filter.
 - Editing other fields alongside state (title/severity/owner/description) is covered in `specs/test-plans/edit-bug.md`.
+- Keyboard-only interaction (opening the edit modal via a focused board row and Enter/Space, operating the filter buttons via keyboard) is not currently tested; not in scope for this round of coverage.
 
 ## Technical Information
 
