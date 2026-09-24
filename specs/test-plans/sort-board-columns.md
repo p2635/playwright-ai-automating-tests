@@ -83,6 +83,38 @@ BuggyBoard's board table lets an authenticated user sort bugs by clicking the ID
 2. The Owner column header no longer has an `aria-sort` attribute. [10-AC4]
 3. The bugs are ordered by severity only. [10-AC4]
 
+#### 2.4. ID column header is clickable and sortable
+
+**Preconditions:**
+
+1. Authenticate as `buggy` and open the board.
+2. At least two bugs exist with distinct IDs.
+
+**Steps:**
+
+1. Click the ID column header.
+
+**Expected Results:**
+
+1. The ID column header has an `aria-sort` attribute set. [10-AC7]
+2. The visible rows are ordered by ID. [10-AC7]
+
+#### 2.5. Owner column header is clickable and sortable
+
+**Preconditions:**
+
+1. Authenticate as `buggy` and open the board.
+2. At least two bugs exist with distinct owners.
+
+**Steps:**
+
+1. Click the Owner column header.
+
+**Expected Results:**
+
+1. The Owner column header has an `aria-sort` attribute set. [10-AC7]
+2. The visible rows are ordered by owner. [10-AC7]
+
 ### 3. Severity sort order
 
 #### 3.1. Severity ascending order is LOW, then MID, then HIGH
@@ -117,72 +149,6 @@ BuggyBoard's board table lets an authenticated user sort bugs by clicking the ID
 
 1. The Severity column header has `aria-sort="descending"`. [10-AC6]
 2. The visible rows are ordered HIGH, then MID, then LOW. [10-AC6]
-
-### 4. All columns are sortable
-
-#### 4.1. ID column header is clickable and sortable
-
-**Preconditions:**
-
-1. Authenticate as `buggy` and open the board.
-2. At least two bugs exist with distinct IDs.
-
-**Steps:**
-
-1. Click the ID column header.
-
-**Expected Results:**
-
-1. The ID column header has an `aria-sort` attribute set. [10-AC7]
-2. The visible rows are ordered by ID. [10-AC7]
-
-#### 4.2. Severity column header is clickable and sortable
-
-**Preconditions:**
-
-1. Authenticate as `buggy` and open the board.
-2. At least two bugs exist with distinct severities.
-
-**Steps:**
-
-1. Click the Severity column header.
-
-**Expected Results:**
-
-1. The Severity column header has an `aria-sort` attribute set. [10-AC7]
-2. The visible rows are ordered by severity. [10-AC7]
-
-#### 4.3. Title column header is clickable and sortable
-
-**Preconditions:**
-
-1. Authenticate as `buggy` and open the board.
-2. At least two bugs exist with distinct titles.
-
-**Steps:**
-
-1. Click the Title column header.
-
-**Expected Results:**
-
-1. The Title column header has an `aria-sort` attribute set. [10-AC7]
-2. The visible rows are ordered by title. [10-AC7]
-
-#### 4.4. Owner column header is clickable and sortable
-
-**Preconditions:**
-
-1. Authenticate as `buggy` and open the board.
-2. At least two bugs exist with distinct owners.
-
-**Steps:**
-
-1. Click the Owner column header.
-
-**Expected Results:**
-
-1. The Owner column header has an `aria-sort` attribute set. [10-AC7]
-2. The visible rows are ordered by owner. [10-AC7]
 
 ## Out of Scope (deferred)
 
