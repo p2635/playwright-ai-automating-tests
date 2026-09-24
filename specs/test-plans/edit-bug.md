@@ -263,6 +263,10 @@ Use `tests/seed.spec.ts` as the Playwright seed for every workflow. Create bugs 
 
 Reuse `tests/pages/board.page.ts` (`openBugByTitle`, `rowByTitle`) and `tests/pages/edit-bug-dialog.page.ts` (`dialog`, `cancelButton`, `saveButton`) as a starting point; extend the latter with labeled field locators: `dialog.getByLabel('ID')`, `getByLabel('Title')`, `getByLabel('Severity')`, `getByLabel('Owner')`, `getByLabel('Description')`, and `getByRole('button', { name: 'Close' })` for the X button. The severity dropdown's color class can be asserted via `toHaveClass(/severity-select-high/)` (or `-mid`/`-low`).
 
+### Testability
+
+- Scenario 3.4 ("Keeps entered data when the backdrop is clicked") targets an unlabeled backdrop `<div>` wrapping the dialog, with no `data-testid` or other stable handle. During generation, click the backdrop container at an offset outside the dialog panel bounds (e.g. `page.locator('[role="dialog"]').click({ position: { x: 4, y: 4 } })` against the outer wrapper, verified against the actual DOM via `playwright-cli` snapshot) rather than guessing a selector up front. If this proves unreliable, flag it back here rather than adding a `data-testid` to app code without confirming with the team first.
+
 ### Spec Traceability Legend
 
 Each `expect` in the test scenarios cites one or more codes from this legend in square brackets, e.g. `[09-AC1]`. `[plan-only]` marks an expectation that documents a test-plan decision with no directly corresponding acceptance criterion.
