@@ -17,8 +17,8 @@ test.describe("Delete bug workflow: open bug", () => {
   test.beforeEach(async ({ loginPage, request }) => {
     // Arrange: create an isolated Open bug for this scenario and log in.
     bug = await createBug(request, {
-      title: `Delete bug test scenario 1.2 ${new Date().toISOString()}`,
-      description: "Deletes an open bug and closes the modal scenario",
+      title: `Delete bug test scenario 1.3 ${new Date().toISOString()}`,
+      description: "Confirming deletion of an open bug closes both modals scenario",
       severity: "LOW",
       owner: "buggy",
       state: "OPEN",
@@ -30,18 +30,23 @@ test.describe("Delete bug workflow: open bug", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("should delete an open bug and close the modal", async ({
+  test("should delete an open bug and close both modals when confirmed", async ({
     boardPage,
     editBugDialog,
+    confirmDeleteBugDialog,
     request,
   }) => {
     await boardPage.openBugByTitle(bug.title);
     await editBugDialog.expectVisible();
 
-    // Act: click Delete.
-    await editBugDialog.delete();
+    // Act: click Delete, then confirm in the confirmation dialog.
+    await editBugDialog.clickDelete();
+    await confirmDeleteBugDialog.expectVisible();
+    await confirmDeleteBugDialog.confirm();
 
-    // Assert: row disappears, Open filter stays selected, and the API confirms removal.
+    // Assert: both dialogs are closed, row disappears, Open filter stays selected,
+    // and the API confirms removal.
+    await expect(editBugDialog.dialog).toBeHidden();
     await expect(boardPage.rowByTitle(bug.title)).toBeHidden();
     await expect(boardPage.openFilterButton).toHaveClass(/bg-primary/);
 
@@ -56,8 +61,8 @@ test.describe("Delete bug workflow: closed bug", () => {
   test.beforeEach(async ({ loginPage, boardPage, request }) => {
     // Arrange: create an isolated Closed bug for this scenario, log in, and switch to the Closed filter.
     bug = await createBug(request, {
-      title: `Delete bug test scenario 1.3 ${new Date().toISOString()}`,
-      description: "Deletes a closed bug and closes the modal scenario",
+      title: `Delete bug test scenario 1.4 ${new Date().toISOString()}`,
+      description: "Confirming deletion of a closed bug closes both modals scenario",
       severity: "LOW",
       owner: "buggy",
       state: "CLOSED",
@@ -70,18 +75,23 @@ test.describe("Delete bug workflow: closed bug", () => {
     await deleteBugIfExists(request, bug.id);
   });
 
-  test("should delete a closed bug and close the modal", async ({
+  test("should delete a closed bug and close both modals when confirmed", async ({
     boardPage,
     editBugDialog,
+    confirmDeleteBugDialog,
     request,
   }) => {
     await boardPage.openBugByTitle(bug.title);
     await editBugDialog.expectVisible();
 
-    // Act: click Delete.
-    await editBugDialog.delete();
+    // Act: click Delete, then confirm in the confirmation dialog.
+    await editBugDialog.clickDelete();
+    await confirmDeleteBugDialog.expectVisible();
+    await confirmDeleteBugDialog.confirm();
 
-    // Assert: row disappears under Closed filter, filter stays selected, and the API confirms removal.
+    // Assert: both dialogs are closed, row disappears under Closed filter, filter stays
+    // selected, and the API confirms removal.
+    await expect(editBugDialog.dialog).toBeHidden();
     await expect(boardPage.rowByTitle(bug.title)).toBeHidden();
     await expect(boardPage.closedFilterButton).toHaveClass(/bg-primary/);
 
@@ -96,7 +106,7 @@ test.describe("Delete bug workflow: persistence after reload", () => {
   test.beforeEach(async ({ loginPage, request }) => {
     // Arrange: create an isolated Open bug for this scenario and log in.
     bug = await createBug(request, {
-      title: `Delete bug test scenario 1.4 ${new Date().toISOString()}`,
+      title: `Delete bug test scenario 1.5 ${new Date().toISOString()}`,
       description: "Deleted bug does not reappear after reload scenario",
       severity: "LOW",
       owner: "buggy",
@@ -113,12 +123,16 @@ test.describe("Delete bug workflow: persistence after reload", () => {
     page,
     boardPage,
     editBugDialog,
+    confirmDeleteBugDialog,
   }) => {
     await boardPage.openBugByTitle(bug.title);
     await editBugDialog.expectVisible();
 
-    // Act: delete the bug, then reload the page.
-    await editBugDialog.delete();
+    // Act: delete the bug via the confirmation dialog, then reload the page.
+    await editBugDialog.clickDelete();
+    await confirmDeleteBugDialog.expectVisible();
+    await confirmDeleteBugDialog.confirm();
+    await expect(editBugDialog.dialog).toBeHidden();
     await expect(boardPage.rowByTitle(bug.title)).toBeHidden();
     await page.reload();
 
@@ -136,14 +150,14 @@ test.describe("Delete bug workflow: unaffected bugs", () => {
     // Arrange: create two isolated Open bugs for this scenario and log in.
     const timestamp = new Date().toISOString();
     bugA = await createBug(request, {
-      title: `Delete bug test scenario 1.6a ${timestamp}`,
+      title: `Delete bug test scenario 1.10a ${timestamp}`,
       description: "Deleting one bug leaves other bugs scenario (bug A)",
       severity: "LOW",
       owner: "buggy",
       state: "OPEN",
     });
     bugB = await createBug(request, {
-      title: `Delete bug test scenario 1.6b ${timestamp}`,
+      title: `Delete bug test scenario 1.10b ${timestamp}`,
       description: "Deleting one bug leaves other bugs scenario (bug B)",
       severity: "LOW",
       owner: "buggy",
@@ -160,15 +174,19 @@ test.describe("Delete bug workflow: unaffected bugs", () => {
   test("should leave other bugs on the board when one is deleted", async ({
     boardPage,
     editBugDialog,
+    confirmDeleteBugDialog,
     request,
   }) => {
     await boardPage.openBugByTitle(bugA.title);
     await editBugDialog.expectVisible();
 
-    // Act: delete the first bug only.
-    await editBugDialog.delete();
+    // Act: delete the first bug only, via the confirmation dialog.
+    await editBugDialog.clickDelete();
+    await confirmDeleteBugDialog.expectVisible();
+    await confirmDeleteBugDialog.confirm();
 
     // Assert: only the first bug's row disappears, and the API reflects only its removal.
+    await expect(editBugDialog.dialog).toBeHidden();
     await expect(boardPage.rowByTitle(bugA.title)).toBeHidden();
     await expect(boardPage.rowByTitle(bugB.title)).toBeVisible();
 
