@@ -36,9 +36,9 @@ export class EditBugDialogPage {
     await expect(this.dialog).toBeVisible();
   }
 
-  async delete() {
+  /** Clicks Delete, which opens the delete-confirmation dialog (does not delete by itself). */
+  async clickDelete() {
     await this.deleteButton.click();
-    await expect(this.dialog).toBeHidden();
   }
 
   async cancel() {
