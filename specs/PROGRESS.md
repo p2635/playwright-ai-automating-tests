@@ -115,9 +115,9 @@ Checklists are updated as each feature is completed. After each feature, the AI 
 
 ## Feature: Delete bug (12-delete-bug.md)
 
-- [x] Spec written in `specs/features/`
-- [x] Backend implemented (deleteBug, DELETE /api/bugs/:id)
-- [x] Frontend implemented (Delete button in Edit bug modal; removes bug, closes modal, board refreshes)
+- [x] Spec written in `specs/features/` (updated to require a confirmation modal before deleting)
+- [x] Backend implemented (deleteBug, DELETE /api/bugs/:id) — unchanged
+- [x] Frontend implemented (Delete button in Edit bug modal opens a `ConfirmDeleteBugModal`; confirm removes bug, closes both modals, board refreshes; cancel/X/Escape closes only the confirmation and keeps the bug)
 - [x] Linter/errors resolved
 
 ---
