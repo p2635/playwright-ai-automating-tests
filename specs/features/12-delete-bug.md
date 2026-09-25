@@ -15,29 +15,24 @@ So that I can remove bugs that are incorrect or no longer needed.
 
 ## Acceptance Criteria
 
-Scenario: Edit bug modal displays a delete button
-  Given the user is authenticated into the app
-  And the user is on the board page
-  And there are bugs in the database
-  When the user opens the edit modal for a bug
-  Then the modal displays a delete button
-
-Scenario: Clicking delete opens a confirmation modal
-  Given the user is authenticated into the app
-  And the user is on the board page
-  And there are bugs in the database
-  When the user opens the edit modal for a bug
-  And the user clicks the delete button
-  Then a confirmation modal is displayed
-  And the confirmation modal displays a confirm button and a cancel button
-  But the bug is not removed from the database
-
-Scenario: Confirming deletion removes the bug from the database and closes the modals
+```gherkin
+Background:
   Given the user is authenticated into the app
   And the user is on the board page
   And there are bugs in the database
   And the user opens the edit modal for a bug
-  And the user clicks the delete button to open the confirmation modal
+
+Scenario: Edit bug modal displays a delete button
+  Then the modal displays a delete button
+
+Scenario: Clicking delete opens a confirmation modal
+  When the user clicks the delete button to open the confirmation modal
+  Then a confirmation modal is displayed
+  And the confirmation modal displays a confirm button and a cancel button
+  And the bug is not removed from the database
+
+Scenario: Confirming deletion removes the bug from the database and closes the modals
+  Given the user clicks the delete button to open the confirmation modal
   When the user clicks the confirm button
   Then the bug is removed from the database
   And the confirmation modal closes
@@ -45,13 +40,10 @@ Scenario: Confirming deletion removes the bug from the database and closes the m
   And the board no longer displays that bug
 
 Scenario: Cancelling the confirmation modal keeps the bug and returns to the edit modal
-  Given the user is authenticated into the app
-  And the user is on the board page
-  And there are bugs in the database
-  And the user opens the edit modal for a bug
-  And the user clicks the delete button to open the confirmation modal
+  Given the user clicks the delete button to open the confirmation modal
   When the user clicks the cancel button
   Then the bug is not removed from the database
   And the confirmation modal closes
   And the edit modal remains open
   And the board still displays that bug
+```
